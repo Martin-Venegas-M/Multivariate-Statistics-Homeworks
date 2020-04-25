@@ -1,0 +1,13 @@
+---
+title: "Database COVID/CASEN"
+author: "Venegas, M & Lafferte, A"
+date: "25 de abril de 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Ayudantía Estadística Multivariada: Creación de base de datos para insumo
