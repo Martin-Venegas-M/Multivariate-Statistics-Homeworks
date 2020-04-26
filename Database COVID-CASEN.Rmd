@@ -33,10 +33,125 @@ En la tercera y 煤ltima secci贸n se **reflexionar谩n** aspectos fundamentales so
 
 ## Primera secci贸n: limpieza y manejo de bases de datos
 
-```{r}
-# Cargar paquetes a utilizar
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = "hide")
 
 ```
 
 
+```{r}
+# Cargar paquetes a utilizar
+pacman::p_load(lme4,
+               reghelper,
+               ggeffects,
+               haven,
+               stargazer,
+               ggplot2, 
+               dplyr, 
+               texreg,
+               ggeffects,
+               corrplot,
+               readxl,
+               xlsx,
+               lmerTest,
+               sjlabelled,
+               DescTools,
+               psych,
+               kableExtra,
+               pander,
+               descr,
+               expss,
+               car,
+               foreing
+               )
 
+
+
+
+```
+
+
+```{r}
+BCV19C <- read.csv("CasosConfirmadosComuna.csv")
+
+BCASEN <- read_spss("Casen 2017.sav")
+```
+
+```{r}
+#Selcci贸n variables en CASEN 
+options(scipen=999)
+
+BDCASEN_proc <- BCASEN %>% select (comuna, 
+                                  edad, 
+                                  sexo, 
+                                  y1, 
+                                  s12, 
+                                  educ, 
+                                  yoprcorh, 
+                                  dau,
+                                  ytotcorh)
+
+
+
+BDCASEN_proc$s12[BDCASEN_proc$s12== 99] <- NA
+BDCASEN_proc$educ[BDCASEN_proc$educ== 99] <- NA
+BDCASEN_proc$y1[BDCASEN_proc$y1== 99] <- NA
+BDCASEN_proc <-na.omit(BDCASEN_proc)
+dim(BDCASEN_proc)
+BDCASEN_proc <-sjlabelled::copy_labels(BDCASEN_proc,BCASEN)
+summary(BDCASEN_proc)
+```
+
+
+```{r}
+#Etiquetaci贸n de variables CASEN. Base COVID 19 por comuna no requiere recodificaci贸n. 
+BDCASEN_proc <- BDCASEN_proc %>% rename("comuna"=comuna, 
+                                        "edad"=edad, 
+                                        "ingreso"=y1, 
+                                        "sexo"=sexo, 
+                                        "educ"=educ, 
+                                        "decilautonomo"=dau, 
+                                        "sistemasalud"=s12, 
+                                        "ingresocorregidoprincipal"=yoprcorh,
+                                        "ingresohogar" =ytotcorh) 
+View(BDCASEN_proc)
+```
+
+
+```{r}
+#Creaci髇 de variables de nivel 2 con Comuna
+
+#Ingreso individual por comuna
+ingresoindivcomuna <- BDCASEN_proc %>% data.frame() %>% select(comuna,ingreso)
+class(BDCASEN_proc$ingreso)
+ingresoindivcomunadf <- ingresoindivcomuna %>%group_by(comuna)%>%summarise(mean_ing_comuna=mean(ingreso,na.rm=TRUE))
+BDCASEN_proc <- merge(BDCASEN_proc ,ingresoindivcomunadf ,by="comuna")
+View(BDCASEN_proc$mean_ing_comuna)
+
+#Ingreso hogar por comuna 
+ingresohogarcomuna <- BDCASEN_proc %>% data.frame() %>% select(comuna, ingresohogar)
+class(BDCASEN_proc$ingresohogar)
+ingresohogarcomunadf <- ingresohogarcomuna %>%group_by(comuna)%>%summarise(mean_inghogar_comuna=mean(ingresohogar, na.rm=TRUE))
+BDCASEN_proc <- merge(BDCASEN_proc ,ingresohogarcomunadf ,by="comuna")
+View(BDCASEN_proc$mean_inghogar_comuna)
+
+#edad por comuna
+edadcomuna <- BDCASEN_proc %>% data.frame() %>% select(comuna,edad)
+class(BDCASEN_proc$edad)
+edadcomunadf <- edadcomuna %>%group_by(comuna)%>%summarise(mean_edad=mean(edad,na.rm=TRUE))
+BDCASEN_proc <- merge(BDCASEN_proc, edadcomunadf, by="comuna")
+View(BDCASEN_proc$mean_edad)
+
+
+#Nivel educacional por comuna
+
+#Sistema de salud por comuna
+
+#sexo por comuna
+
+#decil por comuna
+```
