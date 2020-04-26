@@ -14,5 +14,5 @@ knitr::opts_chunk$set(echo = TRUE)
 
 El presente documento se enmarca en la realización de ayudantías para el ramo de Estadística Multivariada en su versión 2020 a cargo del profesor Juan Carlos Castilo.Este tiene por objetivo servir de ejemplo práctico para los estudiantes y motivar el uso de R en base a la exploración de situaciones contingentes.
 
-En este documento se explorarán los datos respectivos al virus COVID - 19 y sus relaciones a nivel descriptivo con datos agregados a nivel comunal utilizando como fuente la CASEN.
+En este documento se explorarán los datos respectivos al virus COVID - 19 y sus relaciones a nivel descriptivo con datos agregados a nivel comunal utilizando como fuente la CASEN. El producto final del presente documento es una base de datos puesta a dispocisión para los/as estudiantes en el desarrollo de la guía práctica N°3.
 
