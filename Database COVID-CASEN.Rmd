@@ -42,17 +42,15 @@ En primer lugar, cargaremos los paquetes necesarios para el ejercicio
 ```{r}
 # Cargar paquetes a utilizar
 pacman::p_load(
-               dplyr, 
-               texreg,
-               sJlabelled,
+               dplyr,
+               sjlabelled,
                readxl,
                xlsx,
                DescTools,
                psych,
                descr,
                expss,
-               car,
-               foreing
+               car
                )
 
 ```
@@ -66,13 +64,11 @@ BCV19C <- read.csv("CasosConfirmadosComuna.csv")
 BCASEN <- read_spss("Casen 2017.sav")
 ```
 
-Se seleccionan las variables a utilizar:
+En la base de datos de la CASEN 2017 se seleccionan las variables a utilizar:
 ```{r}
-#Desactivar notación cientifica
-options(scipen=999)
 
 #Selcción variables en CASEN 
-BDCASEN_proc <- BCASEN %>% select (comuna, 
+BCASEN1 <- BCASEN %>% select (comuna, 
                                   edad, 
                                   sexo, 
                                   y1, 
@@ -81,25 +77,45 @@ BDCASEN_proc <- BCASEN %>% select (comuna,
                                   yoprcorh, 
                                   dau,
                                   ytotcorh)
-
-
-#Se convierten los datos "99" a NA
-BDCASEN_proc$s12[BDCASEN_proc$s12== 99] <- NA
-BDCASEN_proc$educ[BDCASEN_proc$educ== 99] <- NA
-BDCASEN_proc$y1[BDCASEN_proc$y1== 99] <- NA
-
-BDCASEN_proc <-sjlabelled::copy_labels(BDCASEN_proc,BCASEN)
-summary(BDCASEN_proc)
-
-# Base de datos sin NA
-BDCASEN_proc <-na.omit(BDCASEN_proc)
-dim(BDCASEN_proc)
 ```
 
+Una vez seleccionadas las variables exploraremos los datos en busca de anomalías o cosas a considerar:
+```{r}
+# Descriptios de las variables escogidas
+summary(BCASEN1)
+freq(BCASEN1$edad)
+count(BCASEN1[BCASEN1$edad >99,])
 
+# El summary acá realizado muestra los siguientes datos a considerar:
+
+# Para la edad figura un máximo de 117 años. Esto lleva a indagar la cantidad de casos que presentan arriba de 99 años, en tanto se considera una edad que sobrepasa en demasía la media de expectativa de vida chilena. Existen 39 casos con edades mayor a 99 años. Debido al poco n, no se les atribuye la categoría de NA.
+#*NOTA* Los valores "0" significan residentes menores de 1 año.
+
+freq(BCASEN1$educ)
+
+# Para la educación, hay 1132 casos NS/NR, los cuales corresponden al 0.52% de la muestra. Se traspasan a NA, bajo la justificación de que la categoría NS/NR no será de suma relevancia para la tarea propuesta en este documento.
+
+BCASEN1$educ[BCASEN1$educ== 99] <- NA
+
+freq(BCASEN1$s12)
+
+# Para el sistema de salud al cual se está adscrito existen 5197 casos bajo la categoría "No sabe", correspondiente al 2.4% de la muestra. En tanto puede ser una categoría relevante para el análisis poterior no se le atribuye la categoría de NA.
+
+freq(BCASEN1$y1)
+
+# Para los ingresos, hay 4354 casos que reportan no saber sus ingresos, los cuales corresponden al 6.3% valido (sin contar NA) de la muestra. Se asignarán como NA considerando que no aportan mayor información a los análisis posteriores.
+#*NOTA* Los valores "0" significa que no han percibido ingresos.
+
+BCASEN1$y1[BCASEN1$y1== 99] <- NA
+
+BCASEN1 <-sjlabelled::copy_labels(BCASEN1,BCASEN)
+
+```
+
+Se procede a etiquetar las variables seleccionadas para la CASEN 2017
 ```{r}
 #Etiquetación de variables CASEN. Base COVID 19 por comuna no requiere recodificación. 
-BDCASEN_proc <- BDCASEN_proc %>% rename("comuna"=comuna, 
+BCASEN1 <- BCASEN1 %>% rename("comuna"=comuna, 
                                         "edad"=edad, 
                                         "ingreso"=y1, 
                                         "sexo"=sexo, 
@@ -107,40 +123,149 @@ BDCASEN_proc <- BDCASEN_proc %>% rename("comuna"=comuna,
                                         "decilautonomo"=dau, 
                                         "sistemasalud"=s12, 
                                         "ingresocorregidoprincipal"=yoprcorh,
-                                        "ingresohogar" =ytotcorh) 
-View(BDCASEN_proc)
+                                        "ingresohogar" =ytotcorh)
+```
+
+Se procede a hacer un agrupamiento de las variables de la casen a partir de la comuna:
+```{r}
+# Variables numericas
+
+#Ingreso individual por comuna
+#Media.
+BDC_me <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(ingreso_media = mean(ingreso, na.rm = TRUE))
+
+#Mediana.
+BDC_med <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(ingreso_mediana = median(ingreso, na.rm = TRUE))
+
+#Desviación estandar
+BDC_sd <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(ingreso_desviacionestandar = sd(ingreso, na.rm = TRUE))
+
+#Merge
+BDC_memed <- merge (BDC_me, BDC_med, by = "comuna")
+BDC_ingind <- merge (BDC_memed, BDC_sd, by = "comuna")
+
+#Ingreso hogar por comuna
+#Media.
+BDC_me <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(ingresohogar_media = mean(ingresohogar, na.rm = TRUE))
+
+#Mediana.
+BDC_med <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(ingresohogar_mediana = median(ingresohogar, na.rm = TRUE))
+
+#Desviación estandar
+BDC_sd <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(ingresohogar_desviacionestandar = sd(ingresohogar, na.rm = TRUE))
+
+#Merge
+BDC_memed <- merge (BDC_me, BDC_med, by = "comuna")
+BDC_inghog <- merge (BDC_memed, BDC_sd, by = "comuna")
+
+
+#Edad por comuna
+#Media.
+BDC_me <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(edad_media = mean(edad, na.rm = TRUE))
+
+#Mediana.
+BDC_med <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(edad_mediana = median(edad, na.rm = TRUE))
+
+# Desviación estandar
+BDC_sd <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(edad_desviacionestandar = sd(edad, na.rm = TRUE))
+
+#Merge
+BDC_memed <- merge (BDC_me, BDC_med, by = "comuna")
+BDC_edad <- merge (BDC_memed, BDC_sd, by = "comuna")
+
+
+#Merges de las variables
+BDC_ing <- merge(BDC_ingind, BDC_inghog, by = "comuna")
+BDC_num <- merge(BDC_ing, BDC_edad, by = "comuna")
+
 ```
 
 ```{r}
-#Media de ingreso individual por comuna
-BDC1 <- BDCASEN_proc %>% 
-  group_by(comuna) %>% 
-  summarise(ingreso = mean(ingreso)) %>% 
+# Variables categoricas
+# Porcentaje de hombres por comuna
 
-#Media de ingreso hogar por comuna
-BDC2 <- BDCASEN_proc %>% 
-  group_by(comuna) %>% 
-  summarise(ingresohogar = mean(ingresohogar))
+BDC_sexhom <- BCASEN1 %>%group_by(comuna)%>%summarise(hombre_porcentaje= length(which(sexo==1))/(length(which(sexo==1))+length(which(sexo==2))))
 
-#Media de edad por comuna
-BDC3 <- BDCASEN_proc %>% 
-  group_by(comuna) %>% 
-  summarise(edad = mean(edad))
+BDC_sexmuj <- BCASEN1 %>%group_by(comuna)%>%summarise(mujer_porcentaje= length(which(sexo==2))/(length(which(sexo==1))+length(which(sexo==2))))
 
-#Merges
-BDC1y2 <- merge(BDC1, BDC2, by = "comuna")
-BDC_all <- merge(BDC1y2, BDC3, by = "comuna")
+BDC_sex <- merge(BDC_sexhom, BDC_sexmuj, by = "comuna")
 
+# Porcentaje de Fonasa A por comuna
+BDC_sist_fonA <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaA_porcentaje= length(which(sistemasalud==1))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+
+# Porcentaje de Fonasa B por comuna
+BDC_sist_fonB <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaB_porcentaje= length(which(sistemasalud==2))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+
+# Porcentaje de Fonasa C por Comuna
+BDC_sist_fonC <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaC_porcentaje= length(which(sistemasalud==3))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+
+# Porcentaje de Fonasa D por comuna
+BDC_sist_fonD <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaD_porcentaje= length(which(sistemasalud==4))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+
+# Porcentaje de Fonasa No sabe grupo
+BDC_sist_fonNS <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaNS_porcentaje= length(which(sistemasalud==5))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+
+#Merges FONASA
+BDC_fonAyfonB <- merge(BDC_sist_fonA, BDC_sist_fonB, by = "comuna")
+BDC_fonCyfonD <- merge(BDC_sist_fonC, BDC_sist_fonD, by = "comuna")
+BDC_fonABCD <- merge(BDC_fonAyfonB, BDC_fonCyfonD, by = "comuna")
+BDC_fon <- merge(BDC_fonABCD, BDC_sist_fonNS, by = "comuna")
+
+# Porcentaje FFAA
+BDC_sist_FFAA <- BCASEN1 %>%group_by(comuna)%>%summarise(FFAA_porcentaje= length(which(sistemasalud==6))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+
+# Porcentaje Isapre
+BDC_sist_isapre <- BCASEN1 %>%group_by(comuna)%>%summarise(isapre_porcentaje= length(which(sistemasalud==7))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+
+# Porcentaje Ninguno (particular)
+BDC_sist_ninguno_particular <- BCASEN1 %>%group_by(comuna)%>%summarise(ninguno_particular= length(which(sistemasalud==8))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+
+# Porcentaje Otro sistema
+BDC_sist_otro <- BCASEN1 %>%group_by(comuna)%>%summarise(otrosistema_porcentaje= length(which(sistemasalud==9))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+
+# Porcentaje No sabe
+BDC_sist_NS <- BCASEN1 %>%group_by(comuna)%>%summarise(nosabegrupo_porcentaje= length(which(sistemasalud==99))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+
+#Merges sistemas no fonasa
+BDC_ffaeisapre <- merge(BDC_sist_FFAA, BDC_sist_isapre, by = "comuna")
+BDC_ningunoyotro <- merge(BDC_sist_ninguno_particular, BDC_sist_otro, by= "comuna")
+BDC_1234 <- merge(BDC_ffaeisapre, BDC_ningunoyotro, by = "comuna")
+BDC_sist_nofon <- merge(BDC_1234, BDC_sist_NS, by = "comuna")
+
+
+#Merge sistemas salud
+BDC_sistsalud <- merge(BDC_fon, BDC_sist_nofon)
 ```
 
 
-BDCASEN_proc_1<- BDCASEN_proc %>% filter(sexo %in% 1)
 
-BDC <- BDCASEN_proc %>% 
+
+
+BCASEN1_1<- BCASEN1 %>% filter(sexo %in% 1)
+
+BDC <- BCASEN1 %>% 
   group_by(comuna) %>% 
   summarise(sexo = sum(filter(sexo))
 
-class(BDCASEN_proc$sexo)
+class(BCASEN1$sexo)
 
 #Nivel educacional por comuna
 
