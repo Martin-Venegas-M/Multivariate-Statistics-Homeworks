@@ -7,9 +7,7 @@ output: html_document
 
 # Ayudantía Estadística Multivariada: Creación de base de datos para insumo
 
-El presente documento tiene por objetivo servir de ejemplo práctico para los y las estudiantes y motivar el uso de R en base a la exploración de situaciones contingentes.Este ejercicio se enmarca en la realización de ayudantías para el ramo de Estadística Multivariada en su versión 2020 a cargo del profesor Juan Carlos Castilo.
-
-En este documento se construirá una base de datos con la cual los y las estudiantes podrán explorar los datos respectivos al virus COVID - 19 y sus relaciones a nivel descriptivo con datos agregados a nivel comunal.Bajo esta propuesta es que se utilizarán como fuente la Encuesta de Caracterización Socioeconomica (CASEN) 2017 y la base de datos de contagiados con COVID 19 en el útimo informe epidemiológico brindado por el gobierno (25 de abril 2020). El producto final del presente documento es una base de datos puesta a dispocisión para los/as estudiantes en el desarrollo de la guía práctica N°3.
+Este documento tiene por objetivo construir una base de datos con la cual los y las estudiantes podrán explorar los datos respectivos al virus COVID - 19 y sus relaciones a nivel descriptivo con datos agregados a nivel comunal.Bajo esta propuesta es que se utilizarán como fuente la Encuesta de Caracterización Socioeconomica (CASEN) 2017 y la base de datos de contagiados con COVID 19 en el útimo informe epidemiológico brindado por el gobierno (25 de abril 2020). El producto final del presente documento es una base de datos puesta a dispocisión para los/as estudiantes en el desarrollo de la guía práctica N°3.
 
 El contenido de este documento podría ser estructurado de la siguiente manera: una primera sección que consistirá en la **limpieza y manejo de bases de datos**. Las acciones a realizar en esta primera sección serán las siguientes:
 
@@ -40,13 +38,18 @@ pacman::p_load(
                dplyr,
                sjlabelled,
                readxl,
+               cran,
                openxlsx,
                DescTools,
                psych,
                descr,
                expss,
                car,
-               writexl
+               writexl, 
+               stargazer,
+               kableExtra,
+               sjmisc,
+               sjPlot,
                )
 
 ```
@@ -78,6 +81,7 @@ BCASEN1 <- BCASEN %>% select (comuna,
 
 Una vez seleccionadas las variables exploraremos los datos en busca de anomalías o cosas a considerar:
 ```{r}
+#CASEN
 # Descriptios de las variables escogidas
 summary(BCASEN1)
 freq(BCASEN1$edad)
@@ -107,6 +111,12 @@ BCASEN1$y1[BCASEN1$y1== 99] <- NA
 
 BCASEN1 <-sjlabelled::copy_labels(BCASEN1,BCASEN)
 
+#COVID- 19 COMUNA (DATOS MINSAL AL 25 De ABRIL DE 2020)
+sjmisc::descr(BCV19c,
+      show = c("label","range", "mean", "sd", "NA.prc", "n"))%>%
+      kable(.,"markdown")
+
+
 ```
 
 Se procede a etiquetar las variables seleccionadas para la CASEN 2017
@@ -125,6 +135,7 @@ BCASEN1 <- BCASEN1 %>% rename("comuna"=comuna,
 #Etiquetación de variable comuna en base COVID19
 BCV19c <- BCV19c %>% rename("comuna" = Codigo.comuna)
 ```
+
 
 Se procede a hacer un agrupamiento de las variables de la casen a partir de la comuna:
 ```{r}
@@ -241,7 +252,7 @@ BDC_sex <- merge(BDC_sexhom, BDC_sexmuj, by = "comuna")
 BDC_sex$total_sex <- BDC_sex$hombre_porcentaje + BDC_sex$mujer_porcentaje
 any(BDC_sex$total_sex==!1)
 
-
+#Sistema de salud
 # Porcentaje de Fonasa A por comuna
 BDC_sist_fonA <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaA_porcentaje= length(which(sistemasalud==1))
 /(length(which(sistemasalud==1))+
@@ -352,6 +363,239 @@ BDC_sistsalud$total_sistsalud <- BDC_sistsalud$fonasaA_porcentaje + BDC_sistsalu
 
 any(BDC_sistsalud$total_sistsalud == ! 1)
 
+#Nivel educacional 
+#Porcentaje de sin educación formal por comuna 
+BDC_educ_sin <- BCASEN1 %>%group_by(comuna)%>%summarise(sineducformal_porcentaje= 
+length(which(educ==0))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+                                                        
+#Porcentaje de Basica incompleta por comuna 
+BDC_educ_basic_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(educbasicincomplete_porcentaje= 
+length(which(educ==1))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+#Porcentaje de Basica completa por comuna 
+BDC_educ_basic_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educbasiccomplete_porcentaje= 
+length(which(educ==2))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+#Porcentaje de Media humanista incompleta por comuna
+BDC_educ_hum_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(educhumincomplete_porcentaje= 
+length(which(educ==3))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+#Porcentaje de Media técnica profesional incompleta por comuna
+BDC_educ_tec_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(eductecincomplete_porcentaje= 
+length(which(educ==4))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+#Porcentaje de Media humanista completa por comnuna
+BDC_educ_hum_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educhumcompleta_porcentaje= 
+length(which(educ==5))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+#Porcentaje de Media técnica profesional completa por comuna 
+BDC_educ_tec_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educteccomplete_porcentaje= 
+length(which(educ==6))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+
+
+#Porcentaje de Técnico nivel Superior incompleta por comuna
+BDC_educ_sup_tec_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsuptecincomplete_porcentaje= 
+length(which(educ==7))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+#Porcentaje de Técnico nivel Superior completo por comuna
+BDC_educ_sup_tec_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsupteccomplete_porcentaje=
+length(which(educ==8))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+
+#Porcentaje de Profesional incompleto por comuna
+BDC_educ_sup_prof_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsupprofincomplete_porcentaje= 
+length(which(educ==9))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+
+#Porcentaje de Postgrado incompleto por comuna 
+BDC_educ_sup_post_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsuppostincomplete_porcentaje= 
+length(which(educ==10))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+#Porcentaje de Profesional completo por comuna
+BDC_educ_sup_prof_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsupprofcomplete_porcentaje= 
+length(which(educ==11))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+#Porcentaje de Postgrado completo por comuna
+BDC_educ_sup_post_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsuppostcomplete_porcentaje= 
+length(which(educ==12))
+/(length(which(educ==1))+
+   length(which(educ==2))+
+    length(which(educ==3))+
+     length(which(educ==4))+
+      length(which(educ==5))+
+       length(which(educ==6))+
+        length(which(educ==7))+
+         length(which(educ==8))+
+          length(which(educ==9))+
+           length(which(educ==10))+
+            length(which(educ==11))+
+             length(which(educ==12))))
+
+#Merge niveles educacionales según completo e incompleto por comuna 
+BDC_educ_basiclevel <- merge(BDC_educ_basic_complete, BDC_educ_basic_incomplete, by = "comuna")
+BDC_educ_sineduc_basiclevel <- merge(BDC_educ_sin, BDC_educ_basiclevel, by = "comuna")
+BDC_educ_humlevel <- merge(BDC_educ_hum_complete, BDC_educ_hum_incomplete, by = "comuna")
+BDC_educ_teclevel <- merge(BDC_educ_tec_complete, BDC_educ_tec_incomplete, by = "comuna")
+BDC_educ_sup_proflevel <- merge(BDC_educ_sup_prof_complete, BDC_educ_sup_prof_incomplete, by = "comuna")
+BDC_educ_sup_teclevel <- merge(BDC_educ_sup_tec_complete, BDC_educ_sup_tec_incomplete, by = "comuna")
+BDC_educ_sup_postlevel <- merge(BDC_educ_sup_post_complete, BDC_educ_sup_post_incomplete, by = "comuna")
+
+BDC_media <- merge(BDC_educ_humlevel, BDC_educ_teclevel, by = "comuna")
+BDC_mediaybasica <- merge(BDC_educ_sineduc_basiclevel, BDC_media, by = "comuna")
+BDC_superior <- merge(BDC_educ_sup_teclevel, BDC_educ_sup_proflevel, by = "comuna")
+BDC_superiorypost <- merge(BDC_superior, BDC_educ_sup_postlevel, by = "comuna")
+BDC_niveleducacional <- merge(BDC_mediaybasica, BDC_superiorypost, by = "comuna")
+
+#comprobar
+BDC_niveleducacional$total_niveleducacional <- BDC_niveleducacional$sineducformal_porcentaje + BDC_niveleducacional$educbasicincomplete_porcentaje + BDC_niveleducacional$educbasiccomplete_porcentaje + BDC_niveleducacional$educhumincomplete_porcentaje + BDC_niveleducacional$eductecincomplete_porcentaje +  BDC_niveleducacional$educhumcompleta_porcentaje + BDC_niveleducacional$educteccomplete_porcentaje + BDC_niveleducacional$educsuptecincomplete_porcentaje + BDC_niveleducacional$educsupteccomplete_porcentaje + BDC_niveleducacional$educsupprofincomplete_porcentaje + BDC_niveleducacional$educsuppostincomplete_porcentaje + BDC_niveleducacional$educsupprofcomplete_porcentaje + BDC_niveleducacional$educsuppostcomplete_porcentaje
+
+any(BDC_niveleducacional$total_niveleducacional == ! 1)
+
 # Deciles por comuna
 # Porcentaje decil 1 por comuna
 BDC_decil1 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil1_porcentaje= length(which(decilautonomo==1))
@@ -460,8 +704,10 @@ any (BDC_deciles$total_deciles == !1)
 
 #Merge de variables categoricas
 BDC_sexysistsalud <- merge(BDC_sex, BDC_sistsalud, by = "comuna")
-BDC_cat <- merge(BDC_sexysistsalud, BDC_deciles, by = "comuna")
-#*NOTA* La variable educ (en categorías) no se agrupará pues se considera que la variable años de educación cumple esa función y además hace la base más parsimoniosa. Evaluar si es necesario agrupar por educ.
+BDC_saludydeciles <- merge(BDC_sexysistsalud, BDC_deciles, by = "comuna")
+BDC_cat <- merge(BDC_niveleducacional, BDC_saludydeciles, by = "comuna")
+
+#*NOTA* La variable educ (en categorías) no se agrupará pues se considera que la variable años de educación cumple esa función y además hace la base más parsimoniosa. 
 ```
 
 Una vez agrupadas las nuevas variables en aquellas numericas y categoricas, procedemos a unirlas en una sola base
@@ -480,6 +726,26 @@ BDCV19 <- merge(BCV19c, BDC, by = "comuna")
 Una vez realizado esto, podemos guardar la base en el formato que queramos, en este caso será .xlsx
 ```{r}
 write.xlsx(BDCV19, "CASEN-COVID19.xlsx")
+```
+
+## Segunda sección: algunos descriptivos básicos
+
+Tabla de contingencia seleccionando variables de interes. 
+
+```{r}
+#Tabla Comuna y sistema de salud
+sjt.xtab(BDCV19$Comuna, BDCV19$total_sistsalud, 
+         show.col.prc=TRUE,
+        show.summary=FALSE)
+
+```
+
+Correlación R de Pearsons. 
+```{r}
+res <- cor.test(BDCV19$Casos.Confirmados, BDCV19$ingresohogar_media, 
+                    method = "pearson")
+res
+
 ```
 
 
