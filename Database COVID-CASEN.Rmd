@@ -200,28 +200,69 @@ BDC_num <- merge(BDC_ing, BDC_edad, by = "comuna")
 
 ```{r}
 # Variables categoricas
+
+# Sexo
 # Porcentaje de hombres por comuna
 
-BDC_sexhom <- BCASEN1 %>%group_by(comuna)%>%summarise(hombre_porcentaje= length(which(sexo==1))/(length(which(sexo==1))+length(which(sexo==2))))
+BDC_sexhom <- BCASEN1 %>%group_by(comuna)%>%summarise(hombre_porcentaje= length(which(sexo==1))
+/(length(which(sexo==1))+
+    length(which(sexo==2))))
 
-BDC_sexmuj <- BCASEN1 %>%group_by(comuna)%>%summarise(mujer_porcentaje= length(which(sexo==2))/(length(which(sexo==1))+length(which(sexo==2))))
+BDC_sexmuj <- BCASEN1 %>%group_by(comuna)%>%summarise(mujer_porcentaje= length(which(sexo==2))
+/(length(which(sexo==1))+
+    length(which(sexo==2))))
 
+# Merge sexos
 BDC_sex <- merge(BDC_sexhom, BDC_sexmuj, by = "comuna")
 
+#Comprobar
+BDC_sex$total <- BDC_sex$hombre_porcentaje + BDC_sex$mujer_porcentaje
+any(BDC_sex$total==!1)
+
+
 # Porcentaje de Fonasa A por comuna
-BDC_sist_fonA <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaA_porcentaje= length(which(sistemasalud==1))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+BDC_sist_fonA <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaA_porcentaje= length(which(sistemasalud==1))
+/(length(which(sistemasalud==1))+
+   length(which(sistemasalud==2))+
+    length(which(sistemasalud==3))+
+     length(which(sistemasalud==4))+
+      length(which(sistemasalud==5))+
+       length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 # Porcentaje de Fonasa B por comuna
-BDC_sist_fonB <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaB_porcentaje= length(which(sistemasalud==2))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+BDC_sist_fonB <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaB_porcentaje= length(which(sistemasalud==2))           /(length(which(sistemasalud==1))+
+   length(which(sistemasalud==2))+
+    length(which(sistemasalud==3))+
+     length(which(sistemasalud==4))+
+      length(which(sistemasalud==5))+
+       length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 # Porcentaje de Fonasa C por Comuna
-BDC_sist_fonC <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaC_porcentaje= length(which(sistemasalud==3))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+BDC_sist_fonC <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaC_porcentaje= length(which(sistemasalud==3))
+/(length(which(sistemasalud==1))+
+   length(which(sistemasalud==2))+
+    length(which(sistemasalud==3))+
+     length(which(sistemasalud==4))+
+      length(which(sistemasalud==5))+
+       length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 # Porcentaje de Fonasa D por comuna
-BDC_sist_fonD <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaD_porcentaje= length(which(sistemasalud==4))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+BDC_sist_fonD <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaD_porcentaje= length(which(sistemasalud==4))
+/(length(which(sistemasalud==1))+
+   length(which(sistemasalud==2))+
+    length(which(sistemasalud==3))+
+     length(which(sistemasalud==4))+
+      length(which(sistemasalud==5))+
+       length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 # Porcentaje de Fonasa No sabe grupo
-BDC_sist_fonNS <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaNS_porcentaje= length(which(sistemasalud==5))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+BDC_sist_fonNS <- BCASEN1 %>%group_by(comuna)%>%summarise(fonasaNS_porcentaje= length(which(sistemasalud==5))
+/(length(which(sistemasalud==1))+
+   length(which(sistemasalud==2))+
+    length(which(sistemasalud==3))+
+     length(which(sistemasalud==4))+
+      length(which(sistemasalud==5))+
+       length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 #Merges FONASA
 BDC_fonAyfonB <- merge(BDC_sist_fonA, BDC_sist_fonB, by = "comuna")
@@ -230,19 +271,49 @@ BDC_fonABCD <- merge(BDC_fonAyfonB, BDC_fonCyfonD, by = "comuna")
 BDC_fon <- merge(BDC_fonABCD, BDC_sist_fonNS, by = "comuna")
 
 # Porcentaje FFAA
-BDC_sist_FFAA <- BCASEN1 %>%group_by(comuna)%>%summarise(FFAA_porcentaje= length(which(sistemasalud==6))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+BDC_sist_FFAA <- BCASEN1 %>%group_by(comuna)%>%summarise(FFAA_porcentaje= length(which(sistemasalud==6))
+/(length(which(sistemasalud==1))+
+   length(which(sistemasalud==2))+
+    length(which(sistemasalud==3))+
+     length(which(sistemasalud==4))+
+      length(which(sistemasalud==5))+
+       length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 # Porcentaje Isapre
-BDC_sist_isapre <- BCASEN1 %>%group_by(comuna)%>%summarise(isapre_porcentaje= length(which(sistemasalud==7))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+BDC_sist_isapre <- BCASEN1 %>%group_by(comuna)%>%summarise(isapre_porcentaje= length(which(sistemasalud==7))
+/(length(which(sistemasalud==1))+
+   length(which(sistemasalud==2))+
+    length(which(sistemasalud==3))+
+     length(which(sistemasalud==4))+
+      length(which(sistemasalud==5))+
+       length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 # Porcentaje Ninguno (particular)
-BDC_sist_ninguno_particular <- BCASEN1 %>%group_by(comuna)%>%summarise(ninguno_particular= length(which(sistemasalud==8))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+BDC_sist_ninguno_particular <- BCASEN1 %>%group_by(comuna)%>%summarise(ninguno_particular= length(which(sistemasalud==8))
+/(length(which(sistemasalud==1))+
+   length(which(sistemasalud==2))+
+    length(which(sistemasalud==3))+
+     length(which(sistemasalud==4))+
+      length(which(sistemasalud==5))+
+       length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 # Porcentaje Otro sistema
-BDC_sist_otro <- BCASEN1 %>%group_by(comuna)%>%summarise(otrosistema_porcentaje= length(which(sistemasalud==9))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+BDC_sist_otro <- BCASEN1 %>%group_by(comuna)%>%summarise(otrosistema_porcentaje= length(which(sistemasalud==9))
+/(length(which(sistemasalud==1))+
+   length(which(sistemasalud==2))+
+    length(which(sistemasalud==3))+
+     length(which(sistemasalud==4))+
+      length(which(sistemasalud==5))+
+       length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 # Porcentaje No sabe
-BDC_sist_NS <- BCASEN1 %>%group_by(comuna)%>%summarise(nosabegrupo_porcentaje= length(which(sistemasalud==99))/(length(which(sistemasalud==1))+length(which(sistemasalud==2)+length(which(sistemasalud==3) + length(which(sistemasalud==4)+ length(which(sistemasalud==5) + length(which(sistemasalud==6) + length(which(sistemasalud==7)+length(which(sistemasalud==8)+length(which(sistemasalud==9 + length(which(sistemasalud==99)))))))))))))
+BDC_sist_NS <- BCASEN1 %>%group_by(comuna)%>%summarise(nosabegrupo_porcentaje= length(which(sistemasalud==99))
+/(length(which(sistemasalud==1))+
+   length(which(sistemasalud==2))+
+    length(which(sistemasalud==3))+
+     length(which(sistemasalud==4))+
+      length(which(sistemasalud==5))+
+       length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 #Merges sistemas no fonasa
 BDC_ffaeisapre <- merge(BDC_sist_FFAA, BDC_sist_isapre, by = "comuna")
@@ -253,27 +324,12 @@ BDC_sist_nofon <- merge(BDC_1234, BDC_sist_NS, by = "comuna")
 
 #Merge sistemas salud
 BDC_sistsalud <- merge(BDC_fon, BDC_sist_nofon)
+
+# Comprobar
+BDC_sistsalud$total <- BDC_sistsalud$fonasaA_porcentaje + BDC_sistsalud$fonasaB_porcentaje + BDC_sistsalud$fonasaC_porcentaje + BDC_sistsalud$fonasaD_porcentaje + BDC_sistsalud$fonasaNS_porcentaje + BDC_sistsalud$FFAA_porcentaje + BDC_sistsalud$isapre_porcentaje + BDC_sistsalud$ninguno_particular + BDC_sistsalud$otrosistema_porcentaje + BDC_sistsalud$nosabegrupo_porcentaje
+
+any(BDC_sistsalud$total == ! 1)
 ```
 
-
-
-
-
-BCASEN1_1<- BCASEN1 %>% filter(sexo %in% 1)
-
-BDC <- BCASEN1 %>% 
-  group_by(comuna) %>% 
-  summarise(sexo = sum(filter(sexo))
-
-class(BCASEN1$sexo)
-
-#Nivel educacional por comuna
-
-#Sistema de salud por comuna
-
-#sexo por comuna
-
-#decil por comuna
-```
 
 
