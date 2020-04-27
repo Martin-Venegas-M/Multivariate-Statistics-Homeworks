@@ -76,7 +76,8 @@ BCASEN1 <- BCASEN %>% select (comuna,
                                   educ, 
                                   yoprcorh, 
                                   dau,
-                                  ytotcorh)
+                                  ytotcorh,
+                                  esc)
 ```
 
 Una vez seleccionadas las variables exploraremos los datos en busca de anomalías o cosas a considerar:
@@ -191,10 +192,32 @@ BDC_sd <- BCASEN1 %>%
 BDC_memed <- merge (BDC_me, BDC_med, by = "comuna")
 BDC_edad <- merge (BDC_memed, BDC_sd, by = "comuna")
 
+# Años escolaridad por comuna
+#Media.
+BDC_me <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(anosescolaridad_media = mean(esc, na.rm = TRUE))
+
+#Mediana.
+BDC_med <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(anosescolaridad_mediana = median(esc, na.rm = TRUE))
+
+# Desviación estandar
+BDC_sd <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(anosescolaridad_desviacionestandar = sd(esc, na.rm = TRUE))
+
+#Merge
+BDC_memed <- merge (BDC_me, BDC_med, by = "comuna")
+BDC_edan <- merge (BDC_memed, BDC_sd, by = "comuna")
+
+
 
 #Merges de las variables
 BDC_ing <- merge(BDC_ingind, BDC_inghog, by = "comuna")
-BDC_num <- merge(BDC_ing, BDC_edad, by = "comuna")
+BDC_ingyedad <- merge(BDC_ing, BDC_edad, by = "comuna")
+BDC_num <- merge(BDC_ingyedad, BDC_edan, by = "comuna")
 
 ```
 
@@ -329,6 +352,112 @@ BDC_sistsalud <- merge(BDC_fon, BDC_sist_nofon)
 BDC_sistsalud$total <- BDC_sistsalud$fonasaA_porcentaje + BDC_sistsalud$fonasaB_porcentaje + BDC_sistsalud$fonasaC_porcentaje + BDC_sistsalud$fonasaD_porcentaje + BDC_sistsalud$fonasaNS_porcentaje + BDC_sistsalud$FFAA_porcentaje + BDC_sistsalud$isapre_porcentaje + BDC_sistsalud$ninguno_particular + BDC_sistsalud$otrosistema_porcentaje + BDC_sistsalud$nosabegrupo_porcentaje
 
 any(BDC_sistsalud$total == ! 1)
+
+# Deciles por comuna
+# Porcentaje decil 1 por comuna
+BDC_decil1 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil1_porcentaje= length(which(decilautonomo==1))
+/(length(which(decilautonomo==1))+
+   length(which(decilautonomo==2))+
+    length(which(decilautonomo==3))+
+     length(which(decilautonomo==4))+
+      length(which(decilautonomo==5))+
+       length(which(decilautonomo==6))+                                                                                         length(which(decilautonomo==7))+                                                                                         length(which(decilautonomo==8))+                                                                                          length(which(decilautonomo==9))+                                                                                          length(which(decilautonomo==10))))
+
+# Porcentaje decil 2 por comuna
+BDC_decil2 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil2_porcentaje= length(which(decilautonomo==2))
+/(length(which(decilautonomo==1))+
+   length(which(decilautonomo==2))+
+    length(which(decilautonomo==3))+
+     length(which(decilautonomo==4))+
+      length(which(decilautonomo==5))+
+       length(which(decilautonomo==6))+                                                                                         length(which(decilautonomo==7))+                                                                                         length(which(decilautonomo==8))+                                                                                          length(which(decilautonomo==9))+                                                                                          length(which(decilautonomo==10))))
+
+# Porcentaje decil 3 por comuna
+BDC_decil3 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil3_porcentaje= length(which(decilautonomo==3))
+/(length(which(decilautonomo==1))+
+   length(which(decilautonomo==2))+
+    length(which(decilautonomo==3))+
+     length(which(decilautonomo==4))+
+      length(which(decilautonomo==5))+
+       length(which(decilautonomo==6))+                                                                                         length(which(decilautonomo==7))+                                                                                         length(which(decilautonomo==8))+                                                                                          length(which(decilautonomo==9))+                                                                                          length(which(decilautonomo==10))))
+
+# Porcentaje decil 4 por comuna
+BDC_decil4 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil4_porcentaje= length(which(decilautonomo==4))
+/(length(which(decilautonomo==1))+
+   length(which(decilautonomo==2))+
+    length(which(decilautonomo==3))+
+     length(which(decilautonomo==4))+
+      length(which(decilautonomo==5))+
+       length(which(decilautonomo==6))+                                                                                         length(which(decilautonomo==7))+                                                                                         length(which(decilautonomo==8))+                                                                                          length(which(decilautonomo==9))+                                                                                          length(which(decilautonomo==10))))
+
+# Porcentaje decil 5 por comuna
+BDC_decil5 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil5_porcentaje= length(which(decilautonomo==5))
+/(length(which(decilautonomo==1))+
+   length(which(decilautonomo==2))+
+    length(which(decilautonomo==3))+
+     length(which(decilautonomo==4))+
+      length(which(decilautonomo==5))+
+       length(which(decilautonomo==6))+                                                                                         length(which(decilautonomo==7))+                                                                                         length(which(decilautonomo==8))+                                                                                          length(which(decilautonomo==9))+                                                                                          length(which(decilautonomo==10))))
+
+# Porcentaje decil 6 por comuna
+BDC_decil6 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil6_porcentaje= length(which(decilautonomo==6))
+/(length(which(decilautonomo==1))+
+   length(which(decilautonomo==2))+
+    length(which(decilautonomo==3))+
+     length(which(decilautonomo==4))+
+      length(which(decilautonomo==5))+
+       length(which(decilautonomo==6))+                                                                                         length(which(decilautonomo==7))+                                                                                         length(which(decilautonomo==8))+                                                                                          length(which(decilautonomo==9))+                                                                                          length(which(decilautonomo==10))))
+
+# Porcentaje decil 7 por comuna
+BDC_decil7 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil7_porcentaje= length(which(decilautonomo==7))
+/(length(which(decilautonomo==1))+
+   length(which(decilautonomo==2))+
+    length(which(decilautonomo==3))+
+     length(which(decilautonomo==4))+
+      length(which(decilautonomo==5))+
+       length(which(decilautonomo==6))+                                                                                         length(which(decilautonomo==7))+                                                                                         length(which(decilautonomo==8))+                                                                                          length(which(decilautonomo==9))+                                                                                          length(which(decilautonomo==10))))
+
+# Porcentaje decil 8 por comuna
+BDC_decil8 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil8_porcentaje= length(which(decilautonomo==8))
+/(length(which(decilautonomo==1))+
+   length(which(decilautonomo==2))+
+    length(which(decilautonomo==3))+
+     length(which(decilautonomo==4))+
+      length(which(decilautonomo==5))+
+       length(which(decilautonomo==6))+                                                                                         length(which(decilautonomo==7))+                                                                                         length(which(decilautonomo==8))+                                                                                          length(which(decilautonomo==9))+                                                                                          length(which(decilautonomo==10))))
+
+# Porcentaje decil 9 por comuna
+BDC_decil9 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil9_porcentaje= length(which(decilautonomo==9))
+/(length(which(decilautonomo==1))+
+   length(which(decilautonomo==2))+
+    length(which(decilautonomo==3))+
+     length(which(decilautonomo==4))+
+      length(which(decilautonomo==5))+
+       length(which(decilautonomo==6))+                                                                                         length(which(decilautonomo==7))+                                                                                         length(which(decilautonomo==8))+                                                                                          length(which(decilautonomo==9))+                                                                                          length(which(decilautonomo==10))))
+
+# Porcentaje decil 10 por comuna
+BDC_decil10 <- BCASEN1 %>%group_by(comuna)%>%summarise(decil10_porcentaje= length(which(decilautonomo==10))
+/(length(which(decilautonomo==1))+
+   length(which(decilautonomo==2))+
+    length(which(decilautonomo==3))+
+     length(which(decilautonomo==4))+
+      length(which(decilautonomo==5))+
+       length(which(decilautonomo==6))+                                                                                         length(which(decilautonomo==7))+                                                                                         length(which(decilautonomo==8))+                                                                                          length(which(decilautonomo==9))+                                                                                          length(which(decilautonomo==10))))
+# Merges
+BDC_d1yd2 <- merge(BDC_decil1, BDC_decil2, by = "comuna")
+BDC_d3yd4 <- merge (BDC_decil3, BDC_decil4, by = "comuna")
+BDC_d5yd6 <- merge(BDC_decil5, BDC_decil6, by = "comuna")
+BDC_d7yd8 <- merge(BDC_decil7, BDC_decil8, by = "comuna")
+BDC_d9yd10 <- merge(BDC_decil9, BDC_decil10, by = "comuna")
+BDC_d1d2d3d4 <- merge(BDC_d1yd2, BDC_d3yd4, by = "comuna")
+BDC_d5d6d7d8 <- merge(BDC_d5yd6, BDC_d7yd8, by = "comuna")
+BDC_descs <- merge(BDC_d1d2d3d4, BDC_d5d6d7d8, by = "comuna")
+BDC_deciles <- merge(BDC_descs, BDC_d9yd10, by = "comuna")
+
+# Comprobar
+BDC_deciles$total <- BDC_deciles$decil1_porcentaje + BDC_deciles$decil2_porcentaje + BDC_deciles$decil3_porcentaje + BDC_deciles$decil4_porcentaje + BDC_deciles$decil5_porcentaje + BDC_deciles$decil6_porcentaje + BDC_deciles$decil7_porcentaje + BDC_deciles$decil8_porcentaje + BDC_deciles$decil9_porcentaje + BDC_deciles$decil10_porcentaje
+
+any (BDC_deciles$total == !1)
 ```
 
 
