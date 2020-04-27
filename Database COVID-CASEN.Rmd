@@ -33,58 +33,45 @@ En la tercera y 煤ltima secci贸n se **reflexionar谩n** aspectos fundamentales so
 
 ## Primera secci贸n: limpieza y manejo de bases de datos
 
-
-
-
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, results = "hide")
 
 ```
 
-
+En primer lugar, cargaremos los paquetes necesarios para el ejercicio
 ```{r}
 # Cargar paquetes a utilizar
-pacman::p_load(lme4,
-               reghelper,
-               ggeffects,
-               haven,
-               stargazer,
-               ggplot2, 
+pacman::p_load(
                dplyr, 
                texreg,
-               ggeffects,
-               corrplot,
+               sJlabelled,
                readxl,
                xlsx,
-               lmerTest,
-               sjlabelled,
                DescTools,
                psych,
-               kableExtra,
-               pander,
                descr,
                expss,
                car,
                foreing
                )
 
-
-
-
 ```
 
-
+Acto seguido, procedemos a cargar las bases de datos a utilizar
 ```{r}
+#Base de datos COVID 19 al 25 de abril de 2020
 BCV19C <- read.csv("CasosConfirmadosComuna.csv")
 
+#Base de datos CASEN 2017
 BCASEN <- read_spss("Casen 2017.sav")
 ```
 
+Se seleccionan las variables a utilizar:
 ```{r}
-#Selcci贸n variables en CASEN 
+#Desactivar notaci贸n cientifica
 options(scipen=999)
 
+#Selcci贸n variables en CASEN 
 BDCASEN_proc <- BCASEN %>% select (comuna, 
                                   edad, 
                                   sexo, 
@@ -96,14 +83,17 @@ BDCASEN_proc <- BCASEN %>% select (comuna,
                                   ytotcorh)
 
 
-
+#Se convierten los datos "99" a NA
 BDCASEN_proc$s12[BDCASEN_proc$s12== 99] <- NA
 BDCASEN_proc$educ[BDCASEN_proc$educ== 99] <- NA
 BDCASEN_proc$y1[BDCASEN_proc$y1== 99] <- NA
-BDCASEN_proc <-na.omit(BDCASEN_proc)
-dim(BDCASEN_proc)
+
 BDCASEN_proc <-sjlabelled::copy_labels(BDCASEN_proc,BCASEN)
 summary(BDCASEN_proc)
+
+# Base de datos sin NA
+BDCASEN_proc <-na.omit(BDCASEN_proc)
+dim(BDCASEN_proc)
 ```
 
 
@@ -121,31 +111,36 @@ BDCASEN_proc <- BDCASEN_proc %>% rename("comuna"=comuna,
 View(BDCASEN_proc)
 ```
 
-
 ```{r}
-#Creaci髇 de variables de nivel 2 con Comuna
+#Media de ingreso individual por comuna
+BDC1 <- BDCASEN_proc %>% 
+  group_by(comuna) %>% 
+  summarise(ingreso = mean(ingreso)) %>% 
 
-#Ingreso individual por comuna
-ingresoindivcomuna <- BDCASEN_proc %>% data.frame() %>% select(comuna,ingreso)
-class(BDCASEN_proc$ingreso)
-ingresoindivcomunadf <- ingresoindivcomuna %>%group_by(comuna)%>%summarise(mean_ing_comuna=mean(ingreso,na.rm=TRUE))
-BDCASEN_proc <- merge(BDCASEN_proc ,ingresoindivcomunadf ,by="comuna")
-View(BDCASEN_proc$mean_ing_comuna)
+#Media de ingreso hogar por comuna
+BDC2 <- BDCASEN_proc %>% 
+  group_by(comuna) %>% 
+  summarise(ingresohogar = mean(ingresohogar))
 
-#Ingreso hogar por comuna 
-ingresohogarcomuna <- BDCASEN_proc %>% data.frame() %>% select(comuna, ingresohogar)
-class(BDCASEN_proc$ingresohogar)
-ingresohogarcomunadf <- ingresohogarcomuna %>%group_by(comuna)%>%summarise(mean_inghogar_comuna=mean(ingresohogar, na.rm=TRUE))
-BDCASEN_proc <- merge(BDCASEN_proc ,ingresohogarcomunadf ,by="comuna")
-View(BDCASEN_proc$mean_inghogar_comuna)
+#Media de edad por comuna
+BDC3 <- BDCASEN_proc %>% 
+  group_by(comuna) %>% 
+  summarise(edad = mean(edad))
 
-#edad por comuna
-edadcomuna <- BDCASEN_proc %>% data.frame() %>% select(comuna,edad)
-class(BDCASEN_proc$edad)
-edadcomunadf <- edadcomuna %>%group_by(comuna)%>%summarise(mean_edad=mean(edad,na.rm=TRUE))
-BDCASEN_proc <- merge(BDCASEN_proc, edadcomunadf, by="comuna")
-View(BDCASEN_proc$mean_edad)
+#Merges
+BDC1y2 <- merge(BDC1, BDC2, by = "comuna")
+BDC_all <- merge(BDC1y2, BDC3, by = "comuna")
 
+```
+
+
+BDCASEN_proc_1<- BDCASEN_proc %>% filter(sexo %in% 1)
+
+BDC <- BDCASEN_proc %>% 
+  group_by(comuna) %>% 
+  summarise(sexo = sum(filter(sexo))
+
+class(BDCASEN_proc$sexo)
 
 #Nivel educacional por comuna
 
@@ -155,3 +150,5 @@ View(BDCASEN_proc$mean_edad)
 
 #decil por comuna
 ```
+
+
