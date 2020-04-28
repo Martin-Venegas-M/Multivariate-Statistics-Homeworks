@@ -7,24 +7,84 @@ output: html_document
 
 # Ayudantía Estadística Multivariada: Creación de base de datos para insumo
 
-Este documento tiene por objetivo construir una base de datos con la cual los y las estudiantes podrán explorar los datos respectivos al virus COVID - 19 y sus relaciones a nivel descriptivo con datos agregados a nivel comunal.Bajo esta propuesta es que se utilizarán como fuente la Encuesta de Caracterización Socioeconomica (CASEN) 2017 y la base de datos de contagiados con COVID 19 en el útimo informe epidemiológico brindado por el gobierno (25 de abril 2020). El producto final del presente documento es una base de datos puesta a dispocisión para los/as estudiantes en el desarrollo de la guía práctica N°3.
+## Resumen ejecutivo
 
-El contenido de este documento podría ser estructurado de la siguiente manera: una primera sección que consistirá en la **limpieza y manejo de bases de datos**. Las acciones a realizar en esta primera sección serán las siguientes:
+La base de datos "CASEN-COVID19.xlsx" consiste en una muestra de 324 comunas correspondiente a datos del 2017 y el 2019. Esta ha sido diseñada a partir de la unión de la base "Casen 2017.sav" y "CasosConfirmadosComuna.csv", donde la base "CASEN 2017"" brinda los datos necesarios para una caracterización socioeconomica de la población chilena, y la base de datos de "CasosConfirmadosComuna"" consiste en una presentación en detalle de los casos confirmados con COVID- 19 por comuna al año 2020. Ambas fueron unidas a partir del procedimiento *merge* que permite unir dos bases de datos a partir de una *variable llave*, la cual en este caso fue la *comuna*. Trabajando con los datos sobre el COVID 19 y los datos agregados de la CASEN 2017 es que se logra construir esta base de datos.
+
+Las variables que contiene esta base son las siguientes (en parentesis el nombre utilizado en la base de datos):
+
+- Codigos de comuna = *comuna*
+- Nombres de región = *Region*
+- Codigos de región = *Codigo.region*
+- Nombres de comuna = *Comuna*
+- Población de la comuna = *Poblacion*
+- Casos confirmados en la comuna = *Casos.confirmados*
+- Media de ingresos individuales a nivel comunal = *ingreso_media*
+- Mediana de ingresos individuales a nivel comunal = *ingreso_mediana*
+- Mediana de ingresos individuales a nivel comunal = *ingreso_desviacionestandar*
+- Media de ingresos por hogares a nivel comunal = *ingresohogar_media*
+- Mediana de ingresos por hogares a nivel comunal = *ingresohogar_mediana*
+- Desviacion estandar de ingresos por hogares a nivel comunal = *ingresohogar_desviacionestandar*
+- Media de edad a nivel comunal = *edad_media*
+- Mediana de edad a nivel comunal = *edad_mediana*
+- Desviacion estandar de edad a nivel comunal = *edad_desviacionestandar*
+- Media de años de escolaridad a nivel comunal = *anosescolaridad_media*
+- Mediana de años de escolaridad a nivel comunal = *anosescolaridad_mediana*
+- Desviacion estandar de años de escolaridad a nivel comunal *anosescolaridad_desviacionestandar*
+- Porcentaje de sin educación formal a nivel comunal = *sineducformal_porcentaje*
+- Porcentaje de basica incompleta a nivel comunal = *educbasicincomplete_porcentaje*
+- Porcentaje de basica completa a nivel comunal = *educbasiccomplete_porcentaje*
+- Porcentaje de media humanista incompleta a nivel comunal = *educhumincompleta_porcentaje*
+- Porcentaje de media humanista completa a nivel comunal = *educhumcompleta_porcentaje*
+- Porcentaje de media tecnica incompleta a nivel comunal = *eductecincompleta_porcentaje*
+- Porcentaje de media tecnica completa a nivel comunal = *educteccompleta_porcentaje*
+- Porcentaje de tecnico profesional incompleto a nivel comunal = *educsuptecincomplete_porcentaje*
+- Porcentaje de tecnico profesional completo a nivel comunal = *educsupteccomplete_porcentaje*
+- Porcentaje de profesional universitario incompleto a nivel comunal = *educsupprofincomplete_porcentaje*
+- Porcentaje de profesional universitario completo a nivel comunal = *educsupprofcomplete_porcentaje*
+- Porcentaje de postgrado incompleto a nivel comunal = *educsupostincomplete_porcentaje*
+- Porcentaje de postgrado completo a nivel comunal = *educsuppostcomplete_porcentaje*
+- Total de porcentajes de niveles educacionales por comuna = *total_niveleducacional*
+- Porcentaje de hombres a nivel comunal = *hombre_porcentaje*
+- Porcentaje de mujeres a nivel comunal = *mujer_porcentaje*
+- Total de porcentajes de cada sexo por comuna = *total_sex*
+- Porcentaje de sistema salud Fonasa A a nivel comunal = *fonasaA_porcentaje*
+- Porcentaje de sistema salud Fonasa B a nivel comunal = *fonasaB_porcentaje*
+- Porcentaje de sistema salud Fonasa C a nivel comunal = *fonasaC_porcentaje*
+- Porcentaje de sistema salud Fonasa D a nivel comunal = *fonasaC_porcentaje*
+- Porcentaje de sistema salud no conoce su grupo de Fonasa a nivel comunal = *fonasaNS_porcentaje*
+- Porcentaje de sistema salud FFAA a nivel comunal = *FFAA_porcentaje*
+- Porcentaje de sistema salud Isapre a nivel comunal = *isapre_porcentaje*
+- Porcentaje sin previsión sistema salud (particulares) a nivel comunal = *ninguno_particular*
+- Porcentaje de otro sistema salud a nivel comunal = *otrosistema_porcentaje*
+- Porcentaje que no conoce su previsión de salud a nivel comunal = *nosabegrupo_porcentaje*
+- Total de porcenajes de sistemas de salud por comuna = *total_sistsalud*
+- Porcentaje de decil 1 a nivel comunal = *decil1_porcentaje*
+- Porcentaje de decil 2 a nivel comunal = *decil2_porcentaje*
+- Porcentaje de decil 3 a nivel comunal = *decil3_porcentaje*
+- Porcentaje de decil 4 a nivel comunal = *decil4_porcentaje*
+- Porcentaje de decil 5 a nivel comunal = *decil5_porcentaje*
+- Porcentaje de decil 6 a nivel comunal = *decil6_porcentaje*
+- Porcentaje de decil 7 a nivel comunal = *decil7_porcentaje*
+- Porcentaje de decil 8 a nivel comunal = *decil8_porcentaje*
+- Porcentaje de decil 9 a nivel comunal = *decil9_porcentaje*
+- Porcentaje de decil 10 a nivel comunal = *decil10_porcentaje*
+- Total de porcentajes de deciles por comuna = *total_deciles*
+
+## Introducción
+Este documento tiene por objetivo construir una base de datos con la cual los y las estudiantes podrán explorar los datos respectivos al virus COVID - 19 y sus relaciones a nivel descriptivo con datos agregados a nivel comunal.Bajo esta propuesta es que se utilizarán como fuente la Encuesta de Caracterización Socioeconomica (CASEN) 2017 y la base de datos de contagiados con COVID 19 en el último informe epidemiológico brindado por el gobierno (25 de abril 2020). El producto final del presente documento es una base de datos puesta a dispocisión para los/as estudiantes en el desarrollo de la guía práctica N°3.
+
+El contenido de este documento girará en torno a la exploración de los datos, el manejo y "limpieza"" de las bases de datos originales, con el objetivo de construir una base acorde a los objetivos del curso. Los principales procesos que se llevarán a cabe serán los siguientes:
 
 1) Se cargarán las bases de datos pertinentes para el ejercicio, a saber; base de datos de distribución de infectados con COVID 19 a nivel comunal y la CASEN 2017.
-2) Se seleccionarán las variables acordes al ejercicio (por ejemplo, nivel socioeconomico, ingresos, edad, sexo etc.) y se renombrarán en caso de ser necesario.
-3) En la base de datos de la CASEN 2017 se agruparán los datos a nivel comunal.
-4) Se procederá a hacer un join con la base de datos del COVID 19 utilizando como llave la variable comuna.
+2) Se seleccionarán las variables acordes al ejercicio (por ejemplo, nivel eduacional, ingresos, edad, sexo etc.) y se renombrarán en caso de ser necesario.
+3) Se explorarán los datos en busca de casos atipicos o "anomalias".
+4) En la base de datos de la CASEN 2017 se agruparán los datos a nivel comunal.
+5) Se procederá a hacer un join con la base de datos del COVID 19 utilizando como llave la variable comuna.
+6) Se extraerá la base de datos terminada en formato .xlsx
 
-Y, si es que el tiempo así lo permite, una segunda sección que se propone en la realización de **descriptivos básicos** de variables de interés. Para esto se procedería de la siguiente manera:
 
-1) Se eligirán comunas a trabajar en base a decisiones justificadas.
-2) Se realizarán tablas de contingencia entre variables de interés y cantidad de contiagiados por comuna.
-3) Se procederá a utilizar correlaciones r de pearson para conocer la relación entre variables de interés.
-
-Cabe mencionar que este documento se focalizará estrictamente en una buena construcción de la base de datos, es decir; de la primera sección.
-
-## Primera sección: limpieza y manejo de bases de datos
+## Manejo de datos: exploración y limpieza
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, results = "hide")
@@ -592,7 +652,8 @@ BDC_superiorypost <- merge(BDC_superior, BDC_educ_sup_postlevel, by = "comuna")
 BDC_niveleducacional <- merge(BDC_mediaybasica, BDC_superiorypost, by = "comuna")
 
 #comprobar
-BDC_niveleducacional$total_niveleducacional <- BDC_niveleducacional$sineducformal_porcentaje + BDC_niveleducacional$educbasicincomplete_porcentaje + BDC_niveleducacional$educbasiccomplete_porcentaje + BDC_niveleducacional$educhumincomplete_porcentaje + BDC_niveleducacional$eductecincomplete_porcentaje +  BDC_niveleducacional$educhumcompleta_porcentaje + BDC_niveleducacional$educteccomplete_porcentaje + BDC_niveleducacional$educsuptecincomplete_porcentaje + BDC_niveleducacional$educsupteccomplete_porcentaje + BDC_niveleducacional$educsupprofincomplete_porcentaje + BDC_niveleducacional$educsuppostincomplete_porcentaje + BDC_niveleducacional$educsupprofcomplete_porcentaje + BDC_niveleducacional$educsuppostcomplete_porcentaje
+BDC_niveleducacional$total_niveleducacional <- BDC_niveleducacional$sineducformal_porcentaje + BDC_niveleducacional$educbasiccomplete_porcentaje + BDC_niveleducacional$educbasicincomplete_porcentaje + BDC_niveleducacional$educhumcompleta_porcentaje + BDC_niveleducacional$educhumincomplete_porcentaje + BDC_niveleducacional$educteccomplete_porcentaje + BDC_niveleducacional$eductecincomplete_porcentaje + BDC_niveleducacional$educsupteccomplete_porcentaje + BDC_niveleducacional$educsuptecincomplete_porcentaje + BDC_niveleducacional$educsupprofcomplete_porcentaje + BDC_niveleducacional$educsupprofincomplete_porcentaje + BDC_niveleducacional$educsuppostcomplete_porcentaje + BDC_niveleducacional$educsuppostincomplete_porcentaje
+
 
 any(BDC_niveleducacional$total_niveleducacional == ! 1)
 
@@ -727,25 +788,4 @@ Una vez realizado esto, podemos guardar la base en el formato que queramos, en e
 ```{r}
 write.xlsx(BDCV19, "CASEN-COVID19.xlsx")
 ```
-
-## Segunda sección: algunos descriptivos básicos
-
-Tabla de contingencia seleccionando variables de interes. 
-
-```{r}
-#Tabla Comuna y sistema de salud
-sjt.xtab(BDCV19$Comuna, BDCV19$total_sistsalud, 
-         show.col.prc=TRUE,
-        show.summary=FALSE)
-
-```
-
-Correlación R de Pearsons. 
-```{r}
-res <- cor.test(BDCV19$Casos.Confirmados, BDCV19$ingresohogar_media, 
-                    method = "pearson")
-res
-
-```
-
 
