@@ -9,9 +9,9 @@ output: html_document
 
 ## Resumen ejecutivo
 
-La base de datos "CASEN-COVID19.xlsx" consiste en una muestra de 324 comunas correspondiente a datos del 2017 y el 2019. Esta ha sido diseñada a partir de la unión de la base "Casen 2017.sav" y "CasosConfirmadosComuna.csv", donde la base "CASEN 2017"" brinda los datos necesarios para una caracterización socioeconomica de la población chilena, y la base de datos de "CasosConfirmadosComuna"" consiste en una presentación en detalle de los casos confirmados con COVID- 19 por comuna al año 2020. Ambas fueron unidas a partir del procedimiento *merge* que permite unir dos bases de datos a partir de una *variable llave*, la cual en este caso fue la *comuna*. Trabajando con los datos sobre el COVID 19 y los datos agregados de la CASEN 2017 es que se logra construir esta base de datos.
+La base de datos "CASEN-COVID19.xlsx" consiste en una muestra de 324 comunas correspondiente a datos del 2017 y el 2019. Esta ha sido diseñada a partir de la unión de la base ["Casen 2017.sav"](http://observatorio.ministeriodesarrollosocial.gob.cl/casen-multidimensional/casen/basedatos.php) y ["CasosConfirmadosComuna.csv"](https://github.com/MinCiencia/Datos-COVID19), donde la base "CASEN 2017"" brinda los datos necesarios para una caracterización socioeconomica de la población chilena, y la base de datos de "CasosConfirmadosComuna"" consiste en una presentación en detalle de los casos confirmados con COVID- 19 por comuna al año 2020. Ambas fueron unidas a partir del procedimiento *merge* que permite unir dos bases de datos a partir de una *variable llave*, la cual en este caso fue la *comuna*. Trabajando con los datos sobre el COVID 19 y los datos agregados de la CASEN 2017 es que se logra construir esta base de datos.
 
-Las variables que contiene esta base son las siguientes (en parentesis el nombre utilizado en la base de datos):
+Las variables que contiene esta base son las siguientes (en cursiva el nombre utilizado en la base de datos):
 
 - Codigos de comuna = *comuna*
 - Nombres de región = *Region*
@@ -427,7 +427,8 @@ any(BDC_sistsalud$total_sistsalud == ! 1)
 #Porcentaje de sin educación formal por comuna 
 BDC_educ_sin <- BCASEN1 %>%group_by(comuna)%>%summarise(sineducformal_porcentaje= 
 length(which(educ==0))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -443,7 +444,8 @@ length(which(educ==0))
 #Porcentaje de Basica incompleta por comuna 
 BDC_educ_basic_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(educbasicincomplete_porcentaje= 
 length(which(educ==1))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -459,7 +461,8 @@ length(which(educ==1))
 #Porcentaje de Basica completa por comuna 
 BDC_educ_basic_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educbasiccomplete_porcentaje= 
 length(which(educ==2))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -475,7 +478,8 @@ length(which(educ==2))
 #Porcentaje de Media humanista incompleta por comuna
 BDC_educ_hum_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(educhumincomplete_porcentaje= 
 length(which(educ==3))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -491,7 +495,8 @@ length(which(educ==3))
 #Porcentaje de Media técnica profesional incompleta por comuna
 BDC_educ_tec_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(eductecincomplete_porcentaje= 
 length(which(educ==4))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -507,7 +512,8 @@ length(which(educ==4))
 #Porcentaje de Media humanista completa por comnuna
 BDC_educ_hum_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educhumcompleta_porcentaje= 
 length(which(educ==5))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -523,7 +529,8 @@ length(which(educ==5))
 #Porcentaje de Media técnica profesional completa por comuna 
 BDC_educ_tec_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educteccomplete_porcentaje= 
 length(which(educ==6))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -541,7 +548,8 @@ length(which(educ==6))
 #Porcentaje de Técnico nivel Superior incompleta por comuna
 BDC_educ_sup_tec_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsuptecincomplete_porcentaje= 
 length(which(educ==7))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -557,7 +565,8 @@ length(which(educ==7))
 #Porcentaje de Técnico nivel Superior completo por comuna
 BDC_educ_sup_tec_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsupteccomplete_porcentaje=
 length(which(educ==8))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -574,7 +583,8 @@ length(which(educ==8))
 #Porcentaje de Profesional incompleto por comuna
 BDC_educ_sup_prof_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsupprofincomplete_porcentaje= 
 length(which(educ==9))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -591,7 +601,8 @@ length(which(educ==9))
 #Porcentaje de Postgrado incompleto por comuna 
 BDC_educ_sup_post_incomplete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsuppostincomplete_porcentaje= 
 length(which(educ==10))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -607,7 +618,8 @@ length(which(educ==10))
 #Porcentaje de Profesional completo por comuna
 BDC_educ_sup_prof_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsupprofcomplete_porcentaje= 
 length(which(educ==11))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -623,7 +635,8 @@ length(which(educ==11))
 #Porcentaje de Postgrado completo por comuna
 BDC_educ_sup_post_complete <- BCASEN1 %>%group_by(comuna)%>%summarise(educsuppostcomplete_porcentaje= 
 length(which(educ==12))
-/(length(which(educ==1))+
+/(length(which(educ==0))+
+  length(which(educ==1))+
    length(which(educ==2))+
     length(which(educ==3))+
      length(which(educ==4))+
@@ -652,10 +665,23 @@ BDC_superiorypost <- merge(BDC_superior, BDC_educ_sup_postlevel, by = "comuna")
 BDC_niveleducacional <- merge(BDC_mediaybasica, BDC_superiorypost, by = "comuna")
 
 #comprobar
-BDC_niveleducacional$total_niveleducacional <- BDC_niveleducacional$sineducformal_porcentaje + BDC_niveleducacional$educbasiccomplete_porcentaje + BDC_niveleducacional$educbasicincomplete_porcentaje + BDC_niveleducacional$educhumcompleta_porcentaje + BDC_niveleducacional$educhumincomplete_porcentaje + BDC_niveleducacional$educteccomplete_porcentaje + BDC_niveleducacional$eductecincomplete_porcentaje + BDC_niveleducacional$educsupteccomplete_porcentaje + BDC_niveleducacional$educsuptecincomplete_porcentaje + BDC_niveleducacional$educsupprofcomplete_porcentaje + BDC_niveleducacional$educsupprofincomplete_porcentaje + BDC_niveleducacional$educsuppostcomplete_porcentaje + BDC_niveleducacional$educsuppostincomplete_porcentaje
+BDC_niveleducacional$total_niveleducacional <- 
+BDC_niveleducacional$sineducformal_porcentaje + 
+  BDC_niveleducacional$educbasiccomplete_porcentaje +
+   BDC_niveleducacional$educbasicincomplete_porcentaje + 
+    BDC_niveleducacional$educhumcompleta_porcentaje + 
+     BDC_niveleducacional$educhumincomplete_porcentaje + 
+      BDC_niveleducacional$educteccomplete_porcentaje + 
+       BDC_niveleducacional$eductecincomplete_porcentaje + 
+        BDC_niveleducacional$educsupteccomplete_porcentaje + 
+         BDC_niveleducacional$educsuptecincomplete_porcentaje + 
+          BDC_niveleducacional$educsupprofcomplete_porcentaje + 
+           BDC_niveleducacional$educsupprofincomplete_porcentaje + 
+            BDC_niveleducacional$educsuppostcomplete_porcentaje +
+             BDC_niveleducacional$educsuppostincomplete_porcentaje
 
 
-any(BDC_niveleducacional$total_niveleducacional == ! 1)
+any(BDC_niveleducacional$total_niveleducacional == !1)
 
 # Deciles por comuna
 # Porcentaje decil 1 por comuna
