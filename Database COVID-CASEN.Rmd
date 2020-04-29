@@ -157,7 +157,8 @@ BCASEN1 <- BCASEN %>% select (comuna,
                               hh_d_prevs,
                               hh_d_hacina,
                               hh_d_servbas,
-                              tot_per)
+                              tot_per,
+                              v12mt)
 ```
 
 Una vez seleccionadas las variables exploraremos los datos en busca de anomalías o cosas a considerar:
@@ -416,23 +417,23 @@ BDC_deficit_servbas_hogar <- merge (BDC_memed, BDC_sd, by = "comuna")
 
 #Tamaño vivienda en mt por comuna 
 #Media
-BDC_me <- BCASEN1 %>% 
-  group_by(comuna) %>% 
-  summarise(tamano_viv_media = mean(tamano_vivienda, na.rm = TRUE))
+#BDC_me <- BCASEN1 %>% 
+ # group_by(comuna) %>% 
+  #summarise(tamano_viv_media = mean(tamano_vivienda, na.rm = TRUE))
 
 #Mediana
-BDC_med <- BCASEN1 %>% 
-  group_by(comuna) %>% 
-  summarise(tamano_viv_mediana = median(tamano_vivienda, na.rm = TRUE))
+#BDC_med <- BCASEN1 %>% 
+ # group_by(comuna) %>% 
+  #summarise(tamano_viv_mediana = median(tamano_vivienda, na.rm = TRUE))
 
 #Desviación estandar
-BDC_sd <- BCASEN1 %>% 
-  group_by(comuna) %>% 
-  summarise(tamano_viv_desviacionestandar = sd(tamano_vivienda, na.rm = TRUE))
+#BDC_sd <- BCASEN1 %>% 
+ # group_by(comuna) %>% 
+  #summarise(tamano_viv_desviacionestandar = sd(tamano_vivienda, na.rm = TRUE))
 
 #Merge 
-BDC_memed <- merge(BDC_me, BDC_med, by = "comuna")
-BDC_tamviv <- merge (BDC_memed, BDC_sd, by = "comuna")
+#BDC_memed <- merge(BDC_me, BDC_med, by = "comuna")
+#BDC_tamviv <- merge (BDC_memed, BDC_sd, by = "comuna")
 
 
 
@@ -447,7 +448,7 @@ BDC_num <- merge(BDC_num, BDC_hacinamiento_hogar, by = "comuna")
 BDC_num <- merge(BDC_num, BDC_total_personas_hogar, by = "comuna")
 BDC_num <- merge(BDC_num, BDC_deficit_prevs_hogar, by = "comuna")
 BDC_num <- merge(BDC_num, BDC_deficit_servbas_hogar, by = "comuna")
-BDC_num <- merge(BDC_num, BDC_tamviv, by = "comuna")
+#BDC_num <- merge(BDC_num, BDC_tamviv, by = "comuna")
 ```
 
 ```{r}
@@ -986,16 +987,10 @@ BDC[,lab.names] = data.frame(apply(BDC[lab.names], 2, as.numeric))
 str(BDC[,lab.names])
 ```
 
-```{r}
-#Factor de expansión comunal
-BDC$fact_exp <- BCASEN$expc
-```
-
 
 Una vez realizado esto, podemos guardar la base en el formato que queramos, en este caso será .xlsx
 ```{r}
 write.xlsx(BDCV19, "CASEN-COVID19.xlsx")
-View(BDCV19)
 ```
 
 
