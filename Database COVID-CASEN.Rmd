@@ -358,7 +358,7 @@ BDC_hacinamiento_hogar <- merge(BDC_memed, BDC_sd, by ="comuna")
 #Media
 BDC_me <- BCASEN1 %>% 
   group_by(comuna) %>% 
-  summarise(total_personas__hogar_media = mean(total_personas_hogar, na.rm = TRUE))
+  summarise(total_personas_hogar_media = mean(total_personas_hogar, na.rm = TRUE))
 
 #Mediana
 BDC_med <- BCASEN1 %>% 
@@ -962,15 +962,8 @@ Una vez agrupadas las nuevas variables en aquellas numericas y categoricas, proc
 BDC <- merge(BDC_num, BDC_cat, by = "comuna")
 ```
 
-Hemos completado el tratamiento de la CASEN 2017. Ahora queda unirla a la base de datos de infectados con COVID 19
 ```{r}
-#Unir bases
-class(BDC)
-class(BCV19c)
-BDCV19 <- merge(BCV19c, BDC, by = "comuna")
-```
-```{r}
-# Analizar que tipode variables son las de la base
+# Analizar que tipo de variables son las de la base
 num.names = BDC %>% select_if(is.numeric) %>% colnames()
 cat.names = BDC %>% select_if(is.character) %>% colnames()
 fac.names = BDC %>% select_if(is.factor) %>% colnames()
@@ -980,12 +973,22 @@ print(cat.names)
 print(fac.names)
 print(lab.names)
 ```
+
 ```{r}
 # Cambiar variables "labelled"
 
 BDC[,lab.names] = data.frame(apply(BDC[lab.names], 2, as.numeric))
 str(BDC[,lab.names])
 ```
+
+Hemos completado el tratamiento de la CASEN 2017. Ahora queda unirla a la base de datos de infectados con COVID 19
+```{r}
+#Unir bases
+class(BDC)
+class(BCV19c)
+BDCV19 <- merge(BCV19c, BDC, by = "comuna")
+```
+
 
 
 Una vez realizado esto, podemos guardar la base en el formato que queramos, en este caso será .xlsx
