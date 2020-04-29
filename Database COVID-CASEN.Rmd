@@ -158,7 +158,7 @@ BCASEN1 <- BCASEN %>% select (comuna,
                               hh_d_hacina,
                               hh_d_servbas,
                               tot_per,
-                              v12mt)
+                              v12)
 ```
 
 Una vez seleccionadas las variables exploraremos los datos en busca de anomalías o cosas a considerar:
@@ -191,6 +191,10 @@ freq(BCASEN1$y1)
 
 BCASEN1$y1[BCASEN1$y1== 99] <- NA
 
+#Metros cuadrados por vivienda. Aquí, el numero 9 representa el No sabe/No responde.
+freq(BCASEN1$v12)
+BCASEN1$v12[BCASEN1$v12== 9] <- NA
+
 BCASEN1 <-sjlabelled::copy_labels(BCASEN1,BCASEN)
 
 
@@ -219,7 +223,7 @@ BCASEN1 <- BCASEN1 %>% rename("comuna"=comuna,
                               "total_personas_hogar"= tot_per,
                               "deficit_prevs_hogar"= hh_d_prevs,
                               "deficit_servbas_hogar"= hh_d_servbas,
-                              "tamano_vivienda" = v12mt)
+                              "tamano_vivienda" = v12)
 
 #Etiquetación de variables en base COVID19
 BCV19c <- BCV19c %>% rename("comuna" = Codigo.comuna, "nombre_comuna" = Comuna, "nombre_region" = Region, "region" = Codigo.region, "poblacion" = Poblacion, "casos_confirmados" = Casos.Confirmados)
@@ -949,10 +953,94 @@ BDC_deciles$total_deciles <- BDC_deciles$decil1_porcentaje + BDC_deciles$decil2_
 
 any (BDC_deciles$total_deciles == !1)
 
+#Metros cuadrados de vivienda por comuna 
+#Porcenate menos de 30 m2 por comuna
+BDC_m2_30 <- BCASEN1 %>%group_by(comuna)%>%summarise(tamano_vivienda_30m_porcentaje= 
+length(which(tamano_vivienda==1))
+/(length(which(tamano_vivienda==1))+
+   length(which(tamano_vivienda==2))+
+    length(which(tamano_vivienda==3))+
+     length(which(tamano_vivienda==4))+
+      length(which(tamano_vivienda==5))+
+       length(which(tamano_vivienda==6))))
+          
+
+#Porcentaje de 30 a 40 m2 por comuna
+BDC_m2_30a40 <- BCASEN1 %>%group_by(comuna)%>%summarise(tamano_vivienda_30a40m_porcentaje= 
+length(which(tamano_vivienda==2))
+/(length(which(tamano_vivienda==1))+
+   length(which(tamano_vivienda==2))+
+    length(which(tamano_vivienda==3))+
+     length(which(tamano_vivienda==4))+
+      length(which(tamano_vivienda==5))+
+       length(which(tamano_vivienda==6))))
+          
+
+
+#Porcentaje de 41 a 60 m2 por comuna
+BDC_m2_41a60 <- BCASEN1 %>%group_by(comuna)%>%summarise(tamano_vivienda_41a60m_porcentaje= 
+length(which(tamano_vivienda==3))
+/(length(which(tamano_vivienda==1))+
+   length(which(tamano_vivienda==2))+
+    length(which(tamano_vivienda==3))+
+     length(which(tamano_vivienda==4))+
+      length(which(tamano_vivienda==5))+
+       length(which(tamano_vivienda==6))))
+          
+
+#Porcentaje de  61 a 100 m2 por comuna
+BDC_m2_61a100 <- BCASEN1 %>%group_by(comuna)%>%summarise(tamano_vivienda_61a100m_porcentaje= 
+length(which(tamano_vivienda==4))
+/(length(which(tamano_vivienda==1))+
+   length(which(tamano_vivienda==2))+
+    length(which(tamano_vivienda==3))+
+     length(which(tamano_vivienda==4))+
+      length(which(tamano_vivienda==5))+
+       length(which(tamano_vivienda==6))))
+          
+
+
+#Porcentaje de 101 a 150 m2 por comuna
+BDC_m2_101a150 <- BCASEN1 %>%group_by(comuna)%>%summarise(tamano_vivienda_101a150m_porcentaje= 
+length(which(tamano_vivienda==5))
+/(length(which(tamano_vivienda==1))+
+   length(which(tamano_vivienda==2))+
+    length(which(tamano_vivienda==3))+
+     length(which(tamano_vivienda==4))+
+      length(which(tamano_vivienda==5))+
+       length(which(tamano_vivienda==6))))
+          
+
+#Porcentaje de más de 150 m2 por comuna
+BDC_m2_150ymas <- BCASEN1 %>%group_by(comuna)%>%summarise(tamano_vivienda_150ymasm_porcentaje= 
+length(which(tamano_vivienda==6))
+/(length(which(tamano_vivienda==1))+
+   length(which(tamano_vivienda==2))+
+    length(which(tamano_vivienda==3))+
+     length(which(tamano_vivienda==4))+
+      length(which(tamano_vivienda==5))+
+       length(which(tamano_vivienda==6))))
+        
+
+#Merge variables 
+BDC_tamano_vivienda_pequena <- merge(BDC_m2_30, BDC_m2_30a40, by = "comuna")
+BDC_tamano_vivienda_mediana <- merge(BDC_m2_41a60, BDC_m2_61a100, by = "comuna")
+BDC_tamano_vivienda_grande <- merge(BDC_m2_101a150, BDC_m2_150ymas, by = "comuna")
+
+BDC_tamano_vivienda <- merge(BDC_tamano_vivienda_pequena, BDC_tamano_vivienda_mediana, by = "comuna")
+BDC_tamano_vivienda <- merge(BDC_tamano_vivienda, BDC_tamano_vivienda_grande, by = "comuna")
+
+#Comprobar 
+BDC_tamano_vivienda$total_tamano_vivienda <- BDC_tamano_vivienda$tamano_vivienda_30m_porcentaje + BDC_tamano_vivienda$tamano_vivienda_30a40m_porcentaje + BDC_tamano_vivienda$tamano_vivienda_41a60m_porcentaje + BDC_tamano_vivienda$tamano_vivienda_61a100m_porcentaje + BDC_tamano_vivienda$tamano_vivienda_101a150m_porcentaje + BDC_tamano_vivienda$tamano_vivienda_150ymasm_porcentaje
+
+any(any (BDC_tamano_vivienda$total_tamano_vivienda == !1))
+
+
 #Merge de variables categoricas
 BDC_sexysistsalud <- merge(BDC_sex, BDC_sistsalud, by = "comuna")
 BDC_saludydeciles <- merge(BDC_sexysistsalud, BDC_deciles, by = "comuna")
 BDC_cat <- merge(BDC_niveleducacional, BDC_saludydeciles, by = "comuna")
+BDC_cat <- merge(BDC_cat, BDC_tamano_vivienda, by = "comuna")
 
 #*NOTA* La variable educ (en categorías) no se agrupará pues se considera que la variable años de educación cumple esa función y además hace la base más parsimoniosa. 
 ```
