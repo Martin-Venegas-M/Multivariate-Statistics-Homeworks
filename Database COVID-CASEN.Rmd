@@ -14,11 +14,11 @@ La base de datos "CASEN-COVID19.xlsx" consiste en una muestra de 324 comunas cor
 Las variables que contiene esta base son las siguientes (en cursiva el nombre utilizado en la base de datos):
 
 - Codigos de comuna = *comuna*
-- Nombres de región = *Region*
-- Codigos de región = *Codigo.region*
-- Nombres de comuna = *Comuna*
-- Población de la comuna = *Poblacion*
-- Casos confirmados en la comuna = *Casos.confirmados*
+- Nombres de región = *nombres_region*
+- Codigos de región = *region*
+- Nombres de comuna = *nombres_comuna*
+- Población de la comuna = *poblacion*
+- Casos confirmados en la comuna = *casos_confirmados*
 - Media de ingresos individuales a nivel comunal = *ingreso_media*
 - Mediana de ingresos individuales a nivel comunal = *ingreso_mediana*
 - Mediana de ingresos individuales a nivel comunal = *ingreso_desviacionestandar*
@@ -31,6 +31,21 @@ Las variables que contiene esta base son las siguientes (en cursiva el nombre ut
 - Media de años de escolaridad a nivel comunal = *anosescolaridad_media*
 - Mediana de años de escolaridad a nivel comunal = *anosescolaridad_mediana*
 - Desviacion estandar de años de escolaridad a nivel comunal *anosescolaridad_desviacionestandar*
+- Media de pobreza = *pobreza_media*
+- Mediana de pobreza = *pobreza_mediana*
+- Desviacion estandar pobreza = *pobreza_desviacionestandar*
+- Media de hacinamiento en el hogar = *hacinamiento_hogar_media*
+- Mediana de hacinamiento en el hogar = *hacinamiento_hogar_mediana*
+- Desviacion estandar de hacinamiento en el hogar = *hacinamiento_hogar_desviacionestandar*
+- Media de total personas en el hogar = *total_personas_hogar_media*
+- Mediana de total de personas en el hogar = *total_personas_hogar_mediana*
+- Desviacion estandar de total de personas en el hogar *total_personas_hogar_desviacionestandar*
+- Media de deficit de adscripcion a sistema de salud = *deficit_prevs_hogar_media*
+- Mediana de deficit de adscripcion a sistema de salud = *deficit_prevs_hogar_mediana*
+- Desviacion estandar de deficit de adscripcion a sistema de salud = *deficit_prevs_hogar_desviacionestandar*
+- Media de deficit de servicios basicos en el hogar = *deficit_servbas_hogar_media*
+- Mediana de deicit de servicios basicos en el hogar = *deficit_servbas_hogar_mediana*
+- Desviacion estandar de deficit de servicios basicos en el hogar = = *deficit_servbas_hogar_desviacionestandar*
 - Porcentaje de sin educación formal a nivel comunal = *sineducformal_porcentaje*
 - Porcentaje de basica incompleta a nivel comunal = *educbasicincomplete_porcentaje*
 - Porcentaje de basica completa a nivel comunal = *educbasiccomplete_porcentaje*
@@ -53,9 +68,9 @@ Las variables que contiene esta base son las siguientes (en cursiva el nombre ut
 - Porcentaje de sistema salud Fonasa C a nivel comunal = *fonasaC_porcentaje*
 - Porcentaje de sistema salud Fonasa D a nivel comunal = *fonasaC_porcentaje*
 - Porcentaje de sistema salud no conoce su grupo de Fonasa a nivel comunal = *fonasaNS_porcentaje*
-- Porcentaje de sistema salud FFAA a nivel comunal = *FFAA_porcentaje*
+- Porcentaje de sistema salud ffaa a nivel comunal = *ffaa_porcentaje*
 - Porcentaje de sistema salud Isapre a nivel comunal = *isapre_porcentaje*
-- Porcentaje sin previsión sistema salud (particulares) a nivel comunal = *ninguno_particular*
+- Porcentaje sin previsión sistema salud (particulares) a nivel comunal = *ninguno_particular_porcentaje*
 - Porcentaje de otro sistema salud a nivel comunal = *otrosistema_porcentaje*
 - Porcentaje que no conoce su previsión de salud a nivel comunal = *nosabegrupo_porcentaje*
 - Total de porcenajes de sistemas de salud por comuna = *total_sistsalud*
@@ -110,7 +125,6 @@ pacman::p_load(
                stargazer,
                kableExtra,
                sjmisc,
-               devtools,
                )
 
 
@@ -203,10 +217,11 @@ BCASEN1 <- BCASEN1 %>% rename("comuna"=comuna,
                               "hacinamiento_hogar"=hh_d_hacina,
                               "total_personas_hogar"= tot_per,
                               "deficit_prevs_hogar"= hh_d_prevs,
-                              "deficit_servbas_hogar"= hh_d_servbas)
+                              "deficit_servbas_hogar"= hh_d_servbas,
+                              "tamano_vivienda" = v12mt)
 
-#Etiquetación de variable comuna en base COVID19
-BCV19c <- BCV19c %>% rename("comuna" = Codigo.comuna)
+#Etiquetación de variables en base COVID19
+BCV19c <- BCV19c %>% rename("comuna" = Codigo.comuna, "nombre_comuna" = Comuna, "nombre_region" = Region, "region" = Codigo.region, "poblacion" = Poblacion, "casos_confirmados" = Casos.Confirmados)
 ```
 
 
@@ -399,6 +414,26 @@ BDC_sd <- BCASEN1 %>%
 BDC_memed <- merge(BDC_me, BDC_med, by = "comuna")
 BDC_deficit_servbas_hogar <- merge (BDC_memed, BDC_sd, by = "comuna")
 
+#Tamaño vivienda en mt por comuna 
+#Media
+BDC_me <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(tamano_viv_media = mean(tamano_vivienda, na.rm = TRUE))
+
+#Mediana
+BDC_med <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(tamano_viv_mediana = median(tamano_vivienda, na.rm = TRUE))
+
+#Desviación estandar
+BDC_sd <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(tamano_viv_desviacionestandar = sd(tamano_vivienda, na.rm = TRUE))
+
+#Merge 
+BDC_memed <- merge(BDC_me, BDC_med, by = "comuna")
+BDC_tamviv <- merge (BDC_memed, BDC_sd, by = "comuna")
+
 
 
 
@@ -412,6 +447,7 @@ BDC_num <- merge(BDC_num, BDC_hacinamiento_hogar, by = "comuna")
 BDC_num <- merge(BDC_num, BDC_total_personas_hogar, by = "comuna")
 BDC_num <- merge(BDC_num, BDC_deficit_prevs_hogar, by = "comuna")
 BDC_num <- merge(BDC_num, BDC_deficit_servbas_hogar, by = "comuna")
+BDC_num <- merge(BDC_num, BDC_tamviv, by = "comuna")
 ```
 
 ```{r}
@@ -486,8 +522,8 @@ BDC_fonCyfonD <- merge(BDC_sist_fonC, BDC_sist_fonD, by = "comuna")
 BDC_fonABCD <- merge(BDC_fonAyfonB, BDC_fonCyfonD, by = "comuna")
 BDC_fon <- merge(BDC_fonABCD, BDC_sist_fonNS, by = "comuna")
 
-# Porcentaje FFAA
-BDC_sist_FFAA <- BCASEN1 %>%group_by(comuna)%>%summarise(FFAA_porcentaje= length(which(sistemasalud==6))
+# Porcentaje ffaa
+BDC_sist_ffaa <- BCASEN1 %>%group_by(comuna)%>%summarise(ffaa_porcentaje= length(which(sistemasalud==6))
 /(length(which(sistemasalud==1))+
    length(which(sistemasalud==2))+
     length(which(sistemasalud==3))+
@@ -505,7 +541,7 @@ BDC_sist_isapre <- BCASEN1 %>%group_by(comuna)%>%summarise(isapre_porcentaje= le
        length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 # Porcentaje Ninguno (particular)
-BDC_sist_ninguno_particular <- BCASEN1 %>%group_by(comuna)%>%summarise(ninguno_particular= length(which(sistemasalud==8))
+BDC_sist_ninguno_particular_porcentaje <- BCASEN1 %>%group_by(comuna)%>%summarise(ninguno_particular_porcentaje= length(which(sistemasalud==8))
 /(length(which(sistemasalud==1))+
    length(which(sistemasalud==2))+
     length(which(sistemasalud==3))+
@@ -532,8 +568,8 @@ BDC_sist_NS <- BCASEN1 %>%group_by(comuna)%>%summarise(nosabegrupo_porcentaje= l
        length(which(sistemasalud==6))+                                                                                         length(which(sistemasalud==7))+                                                                                         length(which(sistemasalud==8))+                                                                                          length(which(sistemasalud==9))+                                                                                          length(which(sistemasalud==99))))
 
 #Merges sistemas no fonasa
-BDC_ffaeisapre <- merge(BDC_sist_FFAA, BDC_sist_isapre, by = "comuna")
-BDC_ningunoyotro <- merge(BDC_sist_ninguno_particular, BDC_sist_otro, by= "comuna")
+BDC_ffaeisapre <- merge(BDC_sist_ffaa, BDC_sist_isapre, by = "comuna")
+BDC_ningunoyotro <- merge(BDC_sist_ninguno_particular_porcentaje, BDC_sist_otro, by= "comuna")
 BDC_1234 <- merge(BDC_ffaeisapre, BDC_ningunoyotro, by = "comuna")
 BDC_sist_nofon <- merge(BDC_1234, BDC_sist_NS, by = "comuna")
 
@@ -542,7 +578,7 @@ BDC_sist_nofon <- merge(BDC_1234, BDC_sist_NS, by = "comuna")
 BDC_sistsalud <- merge(BDC_fon, BDC_sist_nofon)
 
 # Comprobar
-BDC_sistsalud$total_sistsalud <- BDC_sistsalud$fonasaA_porcentaje + BDC_sistsalud$fonasaB_porcentaje + BDC_sistsalud$fonasaC_porcentaje + BDC_sistsalud$fonasaD_porcentaje + BDC_sistsalud$fonasaNS_porcentaje + BDC_sistsalud$FFAA_porcentaje + BDC_sistsalud$isapre_porcentaje + BDC_sistsalud$ninguno_particular + BDC_sistsalud$otrosistema_porcentaje + BDC_sistsalud$nosabegrupo_porcentaje
+BDC_sistsalud$total_sistsalud <- BDC_sistsalud$fonasaA_porcentaje + BDC_sistsalud$fonasaB_porcentaje + BDC_sistsalud$fonasaC_porcentaje + BDC_sistsalud$fonasaD_porcentaje + BDC_sistsalud$fonasaNS_porcentaje + BDC_sistsalud$ffaa_porcentaje + BDC_sistsalud$isapre_porcentaje + BDC_sistsalud$ninguno_particular_porcentaje + BDC_sistsalud$otrosistema_porcentaje + BDC_sistsalud$nosabegrupo_porcentaje
 
 any(BDC_sistsalud$total_sistsalud == ! 1)
 
@@ -932,6 +968,29 @@ class(BDC)
 class(BCV19c)
 BDCV19 <- merge(BCV19c, BDC, by = "comuna")
 ```
+```{r}
+# Analizar que tipode variables son las de la base
+num.names = BDC %>% select_if(is.numeric) %>% colnames()
+cat.names = BDC %>% select_if(is.character) %>% colnames()
+fac.names = BDC %>% select_if(is.factor) %>% colnames()
+lab.names = BDC %>% select_if(is.labelled) %>% colnames()
+print(num.names)
+print(cat.names)
+print(fac.names)
+print(lab.names)
+```
+```{r}
+# Cambiar variables "labelled"
+
+BDC[,lab.names] = data.frame(apply(BDC[lab.names], 2, as.numeric))
+str(BDC[,lab.names])
+```
+
+```{r}
+#Factor de expansión comunal
+BDC$fact_exp <- BCASEN$expc
+```
+
 
 Una vez realizado esto, podemos guardar la base en el formato que queramos, en este caso será .xlsx
 ```{r}
