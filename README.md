@@ -1,3 +1,3 @@
 # Multivariate-Statistics-Homeworks
 Homeworks for Multivariate Statistics assistantship
-Ola
+Revisa que te corra bien. 

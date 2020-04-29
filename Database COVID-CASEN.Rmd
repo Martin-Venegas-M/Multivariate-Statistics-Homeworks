@@ -98,6 +98,7 @@ pacman::p_load(
                dplyr,
                sjlabelled,
                readxl,
+               knitr,
                cran,
                openxlsx,
                DescTools,
@@ -109,8 +110,9 @@ pacman::p_load(
                stargazer,
                kableExtra,
                sjmisc,
-               sjPlot,
+               devtools,
                )
+
 
 ```
 
@@ -136,7 +138,12 @@ BCASEN1 <- BCASEN %>% select (comuna,
                                   yoprcorh, 
                                   dau,
                                   ytotcorh,
-                                  esc)
+                                  esc, 
+                              pobreza,
+                              hh_d_prevs,
+                              hh_d_hacina,
+                              hh_d_servbas,
+                              tot_per)
 ```
 
 Una vez seleccionadas las variables exploraremos los datos en busca de anomalías o cosas a considerar:
@@ -171,6 +178,7 @@ BCASEN1$y1[BCASEN1$y1== 99] <- NA
 
 BCASEN1 <-sjlabelled::copy_labels(BCASEN1,BCASEN)
 
+
 #COVID- 19 COMUNA (DATOS MINSAL AL 25 De ABRIL DE 2020)
 sjmisc::descr(BCV19c,
       show = c("label","range", "mean", "sd", "NA.prc", "n"))%>%
@@ -190,11 +198,18 @@ BCASEN1 <- BCASEN1 %>% rename("comuna"=comuna,
                                         "decilautonomo"=dau, 
                                         "sistemasalud"=s12, 
                                         "ingresocorregidoprincipal"=yoprcorh,
-                                        "ingresohogar" =ytotcorh)
+                                        "ingresohogar" =ytotcorh,
+                              "pobreza"=pobreza,
+                              "hacinamiento_hogar"=hh_d_hacina,
+                              "total_personas_hogar"= tot_per,
+                              "deficit_prevs_hogar"= hh_d_prevs,
+                              "deficit_servbas_hogar"= hh_d_servbas)
 
 #Etiquetación de variable comuna en base COVID19
 BCV19c <- BCV19c %>% rename("comuna" = Codigo.comuna)
 ```
+
+
 
 
 Se procede a hacer un agrupamiento de las variables de la casen a partir de la comuna:
@@ -282,13 +297,121 @@ BDC_sd <- BCASEN1 %>%
 BDC_memed <- merge (BDC_me, BDC_med, by = "comuna")
 BDC_edan <- merge (BDC_memed, BDC_sd, by = "comuna")
 
+#Pobreza hogar por comuna (pobreza por ingresos por hogar)
+#Media
+BDC_me <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(pobreza_media = mean(pobreza, na.rm = TRUE))
+
+#Mediana
+BDC_med <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(pobreza_mediana = median(pobreza, na.rm = TRUE))
+
+#Desviación estandar
+BDC_sd <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(pobreza_desviacionestandar = sd(pobreza, na.rm = TRUE))
+
+#Merge 
+BDC_memed <- merge(BDC_me, BDC_med, by = "comuna")
+BDC_pobreza <- merge (BDC_memed, BDC_sd, by = "comuna")
+
+#Hacinamiento del hogar por comuna 
+#Media 
+BDC_me <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(hacinamiento_hogar_media = mean(hacinamiento_hogar, na.rm = TRUE))
+
+#Mediana
+BDC_med <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(hacinamiento_hogar_mediana = median(hacinamiento_hogar, na.rm = TRUE))
+
+#Desviación estandar 
+BDC_sd <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(hacinamiento_hogar_desviacionestandar = sd(pobreza, na.rm = TRUE))
+
+#Merge
+BDC_memed <- merge(BDC_me, BDC_med, by = "comuna")
+BDC_hacinamiento_hogar <- merge(BDC_memed, BDC_sd, by ="comuna")
+
+
+#Total de personas por hogar por comuna
+#Media
+BDC_me <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(total_personas__hogar_media = mean(total_personas_hogar, na.rm = TRUE))
+
+#Mediana
+BDC_med <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(total_personas_hogar_mediana = median(total_personas_hogar, na.rm = TRUE))
+
+#Desviación estandar
+BDC_sd <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(total_personas_hogar_desviacionestandar = sd(total_personas_hogar, na.rm = TRUE))
+
+#Merge 
+BDC_memed <- merge(BDC_me, BDC_med, by = "comuna")
+BDC_total_personas_hogar <- merge (BDC_memed, BDC_sd, by = "comuna")
+
+
+#Hogar carente en adscripción al sistema de salud por comuna
+#Media
+BDC_me <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(deficit_prevs_hogar_media = mean(deficit_prevs_hogar, na.rm = TRUE))
+
+#Mediana
+BDC_med <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(deficit_prevs_hogar_mediana = median(deficit_prevs_hogar, na.rm = TRUE))
+
+#Desviación estandar
+BDC_sd <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(deficit_prevs_hogar_desviacionestandar = sd(deficit_prevs_hogar, na.rm = TRUE))
+
+#Merge 
+BDC_memed <- merge(BDC_me, BDC_med, by = "comuna")
+BDC_deficit_prevs_hogar <- merge (BDC_memed, BDC_sd, by = "comuna")
+
+#Hogar carente de servicios básicos por comuna 
+#Media
+BDC_me <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(deficit_servbas_hogar_media = mean(deficit_servbas_hogar, na.rm = TRUE))
+
+#Mediana
+BDC_med <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(deficit_servbas_hogar_mediana = median(deficit_servbas_hogar, na.rm = TRUE))
+
+#Desviación estandar
+BDC_sd <- BCASEN1 %>% 
+  group_by(comuna) %>% 
+  summarise(deficit_servbas_hogar_desviacionestandar = sd(deficit_servbas_hogar, na.rm = TRUE))
+
+#Merge 
+BDC_memed <- merge(BDC_me, BDC_med, by = "comuna")
+BDC_deficit_servbas_hogar <- merge (BDC_memed, BDC_sd, by = "comuna")
+
+
 
 
 #Merges de las variables
 BDC_ing <- merge(BDC_ingind, BDC_inghog, by = "comuna")
 BDC_ingyedad <- merge(BDC_ing, BDC_edad, by = "comuna")
 BDC_num <- merge(BDC_ingyedad, BDC_edan, by = "comuna")
-
+#Merge con variables nuevas 
+BDC_num <- merge(BDC_num, BDC_pobreza, by = "comuna")
+BDC_num <- merge(BDC_num, BDC_hacinamiento_hogar, by = "comuna")
+BDC_num <- merge(BDC_num, BDC_total_personas_hogar, by = "comuna")
+BDC_num <- merge(BDC_num, BDC_deficit_prevs_hogar, by = "comuna")
+BDC_num <- merge(BDC_num, BDC_deficit_servbas_hogar, by = "comuna")
 ```
 
 ```{r}
@@ -813,5 +936,8 @@ BDCV19 <- merge(BCV19c, BDC, by = "comuna")
 Una vez realizado esto, podemos guardar la base en el formato que queramos, en este caso será .xlsx
 ```{r}
 write.xlsx(BDCV19, "CASEN-COVID19.xlsx")
+View(BDCV19)
 ```
+
+
 
