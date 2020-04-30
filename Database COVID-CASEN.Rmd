@@ -1041,8 +1041,6 @@ BDC_sexysistsalud <- merge(BDC_sex, BDC_sistsalud, by = "comuna")
 BDC_saludydeciles <- merge(BDC_sexysistsalud, BDC_deciles, by = "comuna")
 BDC_cat <- merge(BDC_niveleducacional, BDC_saludydeciles, by = "comuna")
 BDC_cat <- merge(BDC_cat, BDC_tamano_vivienda, by = "comuna")
-
-#*NOTA* La variable educ (en categorías) no se agrupará pues se considera que la variable años de educación cumple esa función y además hace la base más parsimoniosa. 
 ```
 
 Una vez agrupadas las nuevas variables en aquellas numericas y categoricas, procedemos a unirlas en una sola base
