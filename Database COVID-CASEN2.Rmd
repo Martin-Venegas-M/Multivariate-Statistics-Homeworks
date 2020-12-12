@@ -94,7 +94,7 @@ Las variables que contiene esta base son las siguientes (en cursiva el nombre ut
 - Total de porcentajes de tamaño de vivienda por comuna = *total_tamano_vivienda*
 
 ## Introducción
-Este documento tiene por objetivo construir una base de datos con la cual los y las estudiantes podrán explorar los datos respectivos al virus COVID - 19 y sus relaciones a nivel descriptivo con datos agregados a nivel comunal.Bajo esta propuesta es que se utilizarán como fuente la Encuesta de Caracterización Socioeconomica (CASEN) 2017 y la base de datos de contagiados con COVID 19 en el último informe epidemiológico brindado por el gobierno (25 de abril 2020). El producto final del presente documento es una base de datos puesta a dispocisión para los/as estudiantes en el desarrollo de la guía práctica N°3.
+Este documento tiene por objetivo construir una base de datos con la cual los y las estudiantes podrán explorar los datos respectivos al virus COVID - 19 y sus relaciones a nivel descriptivo con datos agregados a nivel comunal.Bajo esta propuesta es que se utilizarán como fuente la Encuesta de Caracterización Socioeconomica (CASEN) 2017 y la base de datos de contagiados con COVID 19 en el último informe epidemiológico brindado por el gobierno (25 de abril 2020). El producto final del presente documento es una base de datos puesta a dispocisión para los/as estudiantes en el desarrollo de la guía práctica N°3 del ramo.
 
 El contenido de este documento girará en torno a la exploración de los datos, el manejo y "limpieza"" de las bases de datos originales, con el objetivo de construir una base acorde a los objetivos del curso. Los principales procesos que se llevarán a cabe serán los siguientes:
 
